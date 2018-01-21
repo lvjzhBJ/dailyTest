@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+
+{% block body-base %}
+
+<div class="layui-container fly-marginTop">
+  <div class="fly-panel fly-panel-user" pad20>
+    <div class="layui-tab layui-tab-brief" lay-filter="user">
+      <ul class="layui-tab-title">
+        <li class="layui-this">登入</li>
+        <li><a href="/regist">注册</a></li>
+      </ul>
+      <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+        <div class="layui-tab-item layui-show">
+          <div class="layui-form layui-form-pane">
+            <form method="post">
+               {% for i in userform %}
+                      <div class="layui-form-item">
+                        <label class="layui-form-label">{{ i.label}}</label>
+                        <div class="layui-input-inline">
+                            {{i}}
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">{{ i.help_text }}</div>
+                      </div>
+
+                    {% endfor %}
+
+                  {% for j in ver_form %}
+                      <div class="layui-form-item">
+                        <label class="layui-form-label">{{ j.label}}</label>
+                        <div class="layui-input-inline">
+                            {{j}}
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">{{ j.help_text }}</div>
+                      </div>
+
+                    {% endfor %}
+
+                    {% if hash_key %}
+                          <div class="layui-form-item">
+                                <label class="layui-form-label">验证码</label>
+                                <div class="layui-input-inline">
+                                    <a href="#" class="next-captcha">
+                                        <img src="{{ imgage_url }}" class="captcha" alt="captcha">换一张</a>
+                                    <input id="id_reg_captcha_0" name="captcha_0" type="hidden" value="{{ hash_key }}">
+
+                                </div>
+                          </div>
+                    {% endif %}
+              <div class="layui-form-item">
+                <button class="layui-btn" lay-filter="*" lay-submit>立即登录</button>
+                <span style="padding-left:20px;">
+                  <a href="/forget">忘记密码？</a>
+                </span>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+
+        $(".next-captcha").click(function() {
+            $.getJSON('/refresh_captcha', function (json) {
+                var status = json['status'];
+                var new_cptch_key = json['new_cptch_key'];
+                var new_cptch_image = json['new_cptch_image'];
+                id_captcha_0 = $("#id_reg_captcha_0");
+                img = $(".captcha");
+                id_captcha_0.attr("value", new_cptch_key);
+                img.attr("src", new_cptch_image);
+            });
+        })
+
+    </script>
+{% endblock %}

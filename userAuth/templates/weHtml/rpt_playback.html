@@ -1,0 +1,54 @@
+{% extends 'base_logon.html' %}
+
+   {% block body-logon %}
+
+   <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="/{{ username }}/{{ pjt }}/report/show">测试概要</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/sum">测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="#" class="layui-this">测试过程回放</a>
+        </div>
+
+       <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+            <div style="width: 100%;min-height:350px;padding: 0;">
+
+          <div class="layui-collapse">
+          <div class="layui-colla-item">
+            <h2 class="layui-colla-title">项目:{{ pjt }}</h2>
+            <div class="layui-colla-content layui-show">
+                <div class="layui-container">
+                    <div class="layui-row">
+                        <div class="layui-col-md2">
+{#                            <dl class="layui-nav-child">#}
+                        <ul class="layui-tree"></ul>
+                            {% for i in test_case_list %}
+                                <li class="siteTag"><a onclick="
+                                document.getElementById('case_img').innerHTML= ''+
+                                '<img style=\'border:1px #FF00FF solid;\' height=\'300px\' src=\'' +
+                                     '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/'+
+                                        {% for j in i %}
+                                             {{ j.id }} +
+                                        {% endfor %}
+                                        '.gif\' alt=\'None_\' />'+
+                                '';" href="#"><cite>test_case_{{ forloop.counter }}</cite><em></em></a></li>
+
+                            {% endfor %}
+{#                            </dl>#}
+                        </div>
+                        <div class="layui-col-md6">
+                            <ul class="layui-timeline">
+                                <ul id="case_img"></ul>
+                            </ul>
+                        </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+          </div>
+            </div>
+       </div>
+</div>
+{% endblock %}
+

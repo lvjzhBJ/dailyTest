@@ -1,0 +1,55 @@
+{% extends 'base_logon.html' %}
+
+   {% block body-logon %}
+
+   <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="/{{ username }}/{{ pjt }}/report/show">测试概要</a>
+              <span class="fly-mid"></span>
+              <a href="#" class="layui-this">测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/playback">测试过程回放</a>
+        </div>
+
+        <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+            <ul style="width: 100%;min-height:350px;padding: 0;">
+                <div class="layui-collapse">
+          <div class="layui-colla-item">
+            <h2 class="layui-colla-title">项目:{{ pjt }}</h2>
+            <div class="layui-colla-content layui-show">
+                <div class="layui-container">
+                    <div class="layui-row">
+                        <div class="layui-col-md2">
+                        <ul class="layui-tree"></ul>
+                            {% for i in test_case_list %}
+                                <li class="siteTag"><a onclick="
+                                document.getElementById('case_li').innerHTML= ''+
+                                 {% for j in i %}
+                                     '<li class=\'layui-timeline-item\'>' +
+                                     '<i class=\'layui-icon layui-timeline-axis\'>&#xe63f;</i>'+
+                                        '<div class=\'layui-timeline-content layui-text\'>'+
+                                          '<h3 class=\'layui-timeline-title\'>' +
+                                     'test_step_{{ forloop.counter }}</h3><p>{{ j.resource_id }}'+
+                                            '<img style=\'border:1px #FF00FF solid;\' height=\'100px\' src=\'' +
+                                     '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/bo_{{ j.id }}.jpg\' alt=\'None_\' />'+
+                                          '</p></div></li>'+
+                                {% endfor %}
+                                '';" href="#"><cite>test_case_{{ forloop.counter }}</cite><em></em></a></li>
+
+                            {% endfor %}
+{#                            </dl>#}
+                        </div>
+                        <div class="layui-col-md6">
+                            <ul class="layui-timeline">
+                                <ul id="case_li"></ul>
+                            </ul>
+                        </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+          </div>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

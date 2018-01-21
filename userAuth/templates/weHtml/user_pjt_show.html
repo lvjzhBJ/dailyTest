@@ -1,0 +1,83 @@
+{% extends 'base_logon.html' %}
+
+
+{% block body-logon %}
+
+      <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="#" class="layui-this">结构展示</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/case">用例列表</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/edit">编辑用例</a>
+        </div>
+
+          <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+                  <ul style="width: 100%;min-height:350px;padding: 0;" id="treeView"></ul>
+              </div>
+      </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script>
+
+    var bo  = {{ page_info|safe }}
+        ,userid  = {{ userid|safe }}
+        ,pjt_id = {{ pjt_id|safe }};
+
+    if (!bo) {document.getElementById('treeView').innerHTML='<a>未执行初始化,请等待执行</a>';}
+    layui.use(['tree', 'table','layer','element'], function(){
+        var layer = layui.layer
+            ,table = layui.table
+             ,element = layui.element
+            ,$ = layui.jquery;
+
+          layui.tree({
+            elem: '#treeView'
+                ,padding:0
+            ,click: function(item){
+
+                    img_path = '/pageGet/media/img/user'+ userid +'/pjt'+pjt_id+'/bo_'+item.id +'.jpg';
+                    layer.msg(
+                            '<div>'+
+                            '<fieldset class="layui-elem-field" style=" border : 1px solid #ff9900;text-align:left;">'+
+                                '<legend>object_img</legend>'+
+                                '<div class="layui-field-box" align="right" style="height:100px">'+
+                                '<img style="border:1px #FF00FF solid;" width=45% src='+img_path+' alt="None" />'+
+                                '</div>'+
+                            '</fieldset>'+
+                                '</div>'+
+                            '<fieldset class="layui-elem-field" style=" border : 1px solid #ff9900;text-align:left;">' +
+                            '<legend>object_info</legend>' +
+                            '<div class="layui-field-box">'+
+                            '<table class="layui-table lay-data="{ style:\'background-color: #5FB878; color: #fff;\'} style="table-layout:fixed;">' +
+                            '<colgroup> <col width="75"> <col width="325"> </colgroup>' +
+                            '<thead> <tr> <th>属性</th> <th>值</th> </tr> </thead><tbody> ' +
+                                    '<tr> <td>ID</td> <td align="left">'+item.id+'</td> </tr>' +
+                                    '<tr> <td>EOR</td> <td align="left">'+item.is_run_error+'</td> </tr>' +
+                                    '<tr> <td>TEXT</td> <td align="left">'+item.text+'</td> </tr>' +
+                                    '<tr> <td>LOC</td> <td align="left" style="word-wrap:break-word;">'+item.bounds+'</td> </tr>' +
+                                    '<tr> <td>RID</td> <td align="left" style="word-wrap:break-word;">'+item.resource_id+'</td> </tr>' +
+                                    '<tr> <td>x_class</td> <td align="left">'+item.x_class+'</td> </tr>' +
+                            '</tbody></table></div></fieldset> '
+                        , {
+                            time: 6000
+                            ,offset: 'rt'
+                            ,area: ['500px']
+                        }, function(){
+                        });
+                    console.log(item);
+
+            }
+            ,nodes: bo
+          });
+
+    });
+
+    </script>
+
+
+{% endblock %}
+

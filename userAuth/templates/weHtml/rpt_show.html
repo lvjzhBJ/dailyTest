@@ -1,0 +1,90 @@
+{% extends 'base_logon.html' %}
+
+   {% block body-logon %}
+
+   <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="#" class="layui-this">测试概要</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/sum">测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/playback">测试过程回放</a>
+        </div>
+
+        <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+            <ul style="width: 100%;min-height:350px;padding: 0;">
+              <div class="layui-col-md6">
+    {#              {{ test_case_list }}#}
+                  ---
+                  <div id="pio"></div>
+              </div>
+              <div class="layui-col-md6">
+                  <div id="container"></div>
+              </div>
+            </ul>
+          </div>
+      </div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-3d.js"></script>
+
+    <script language="JavaScript">
+        $(document).ready(function() {
+           var chart = {
+              type: 'pie',
+              options3d: {
+                 enabled: true,
+                 alpha: 45,
+                 beta: 0
+              }
+           };
+           var title = {
+              text: '2014 年特定网站各浏览器占有率'
+           };
+           var tooltip = {
+              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+           };
+
+           var plotOptions = {
+              pie: {
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  depth: 35,
+                  dataLabels: {
+                     enabled: true,
+                     format: '{point.name}'
+                  }
+                   }
+           };
+           var series= [{
+                 type: 'pie',
+                    name: 'Browser share',
+                    data: [
+                        ['未变更',   45.0],
+                        ['变更功能',       26.8],
+                        {
+                            name: '新增功能',
+                            y: 12.8,
+                            sliced: true,
+                            selected: true
+                        },
+                        ['未执行',    2]
+                    ]
+           }];
+
+            var json = {};
+           json.chart = chart;
+           json.title = title;
+           json.tooltip = tooltip;
+           json.plotOptions = plotOptions;
+           json.series = series;
+           $('#container').highcharts(json);
+        });
+    </script>
+
+{% endblock %}
