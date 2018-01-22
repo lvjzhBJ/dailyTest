@@ -53,7 +53,7 @@ class Project(models.Model):
     app_file = models.FileField(upload_to='appfile')
     app_plate = models.CharField(max_length=20)
     pjt_owner = models.ForeignKey(User)
-    create_time = models.DurationField(default=time.time())
+    create_time = models.DateTimeField(default=timezone.now())
     crom_status = models.IntegerField(default=0)
 
     def __unicode__(self):
@@ -69,8 +69,8 @@ admin.site.register(Project, ProjectnewAdmin)
 class ResponsePjt(models.Model):
     user_id = models.IntegerField(default=0)
     pjt_info = models.CharField(max_length=4096,null=True)
-    add_time = models.DurationField('添加日期',default = timezone.now)
-    mod_time = models.DurationField('更新日期',default = timezone.now)
+    add_time = models.DateTimeField('添加日期',default = timezone.now)
+    mod_time = models.DateTimeField('更新日期',default = timezone.now)
     user_parent = models.ForeignKey(User,default=None)
 
 
@@ -84,8 +84,8 @@ class ResponsePage(models.Model):
     pjt_id = models.IntegerField(default=0)
     pjt_name = models.CharField(max_length=128,null=True)
     page_info = models.CharField(max_length=4096,null=True)
-    add_time = models.DurationField('添加日期',default = timezone.now)
-    mod_time = models.DurationField('更新日期',default = timezone.now)
+    add_time = models.DateTimeField('添加日期',default = timezone.now)
+    mod_time = models.DateTimeField('更新日期',default = timezone.now)
     pjt_parent = models.ForeignKey(Project,default=None)
 
 
@@ -99,8 +99,8 @@ class ResponseRpt(models.Model):
     pjt_id = models.IntegerField(default=0)
     pjt_name = models.CharField(max_length=128,null=True)
     rpt_info = models.CharField(max_length=4096,null=True)
-    add_time = models.DurationField('添加日期',default = timezone.now)
-    mod_time = models.DurationField('更新日期',default = timezone.now)
+    add_time = models.DateTimeField('添加日期',default = timezone.now)
+    mod_time = models.DateTimeField('更新日期',default = timezone.now)
     pjt_parent = models.ForeignKey(Project,default=None)
 
 

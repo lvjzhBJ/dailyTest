@@ -10,19 +10,18 @@
               <span class="fly-mid"></span>
               <a href="/{{ username }}/del">删除项目</a>
         </div>
-
         <div class="layui-col-md-offset0 fly-panel-main fly-filter">
                           <ul style="width: 100%;min-height:340px;padding: 0;">
-                               {% if project_info %}
+                               {% if project_info_json %}
                                 <table class="layui-table"><colgroup>
                                     <col width="25"><col width="25"><col width="80"><col width="105"><col><col></colgroup>
                                   <thead><tr><th>id</th><th>sta</th><th>plf</th><th>time</th><th>pjt_name</th><th>app_path</th></tr></thead>
                                   <tbody>
-                                {% for i in project_info %}
+                                {% for i in project_info_json %}
                                     <tr><td>{{ i.id }}</td>
                                         <td>{{ i.crom_status }}</td>
                                         <td>{{ i.app_plate }}</td>
-                                        <td>{{ i.4 }}</td>
+                                        <td>{{ i.create_time }}</td>
                                         <td>{{ i.pjt_name }}</td>
                                         <td>{{ i.app_file }}</td></tr>
                                 {% endfor %}

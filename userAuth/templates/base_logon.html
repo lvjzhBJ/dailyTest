@@ -41,8 +41,8 @@
             </li>
         </ul>
 
-            {% if project_info %}
-              {% for i in project_info %}
+            {% if project_info_json %}
+              {% for i in project_info_json %}
                 <dd>
                     <div class="layui-col-md8"><a href="/{{ username }}/{{ i.1 }}/show">
                     <i class="layui-icon">&#xe62e;{{ i.1 }}</i></a></div>

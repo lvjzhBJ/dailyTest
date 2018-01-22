@@ -12,6 +12,7 @@ from userAuth.views import get_project_info
 from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt
 from images2gif import writeGif
 from django.views.decorators.csrf import csrf_exempt
+from userAuth.utils.time2json import CJsonEncoder
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -27,35 +28,35 @@ class ProjectNewForm(forms.Form):
                                        'lay-verify':'required'}))
 
 
-@csrf_exempt
-def project_up(request):
-    if request.method == 'POST':
-        projectform = ProjectNewForm(request.POST, request.FILES)
-
-        if projectform.is_valid():
-            pjt_name = projectform.cleaned_data['pjt_name']
-            app_file = projectform.cleaned_data['app_file']
-
-            pjt = Project()
-            pjt.pjt_name = pjt_name
-            pjt.app_file = app_file
-            username = request.COOKIES.get('username', None)
-            userid = request.COOKIES.get('userid', None)
-            user = User.objects.filter(username=username, id=userid)
-            pjt.pjt_owner=user[0]
-
-            if str(app_file)[-4:] == '.apk':
-                pjt.app_plate = 'Android'
-                pjt.save()
-
-                if user:
-                    pi = get_project_info(user[0])
-                response = render_to_response('success.html',{'pi':pi,'username':username,'pi_json':json.dumps(pi)})
-                return response
-    else:
-        projectform = ProjectNewForm()
-
-    return render_to_response('project_up.html', {'projectform': projectform})
+# @csrf_exempt
+# def project_up(request):
+#     if request.method == 'POST':
+#         projectform = ProjectNewForm(request.POST, request.FILES)
+#
+#         if projectform.is_valid():
+#             pjt_name = projectform.cleaned_data['pjt_name']
+#             app_file = projectform.cleaned_data['app_file']
+#
+#             pjt = Project()
+#             pjt.pjt_name = pjt_name
+#             pjt.app_file = app_file
+#             username = request.COOKIES.get('username', None)
+#             userid = request.COOKIES.get('userid', None)
+#             user = User.objects.filter(username=username, id=userid)
+#             pjt.pjt_owner=user[0]
+#
+#             if str(app_file)[-4:] == '.apk':
+#                 pjt.app_plate = 'Android'
+#                 pjt.save()
+#
+#                 if user:
+#                     pi = get_project_info(user[0])
+#                 response = render_to_response('success.html',{'pi':pi,'username':username,'pi_json':json.dumps(pi)})
+#                 return response
+#     else:
+#         projectform = ProjectNewForm()
+#
+#     return render_to_response('project_up.html', {'projectform': projectform})
 
 
 def get_tree(parent_pjt):
@@ -167,22 +168,19 @@ def user_show(request,un):
     if request.method == 'GET':
 
         email = request.session.get('email')
-        project_info = request.session.get('project_info')
+        project_info_json = request.session.get('project_info_json')
 
         if 1:
             userid = request.session.get('userid')
             db_insert_pjt(userid)
             project_info = get_pjts(userid)
-            request.session['project_info'] = project_info
+            project_info_json = json.dumps(project_info,cls=CJsonEncoder)
+            project_info_json = json.loads(project_info_json)
+            request.session['project_info_json'] = project_info_json
 
-        print '11'
-
-        print project_info
-        print type(project_info)
         rsp = render(request, 'weHtml/user_show.html', {'username': username,
                                                         'email': email,
-                                                        'project_info': project_info})
-
+                                                        'project_info_json': project_info_json})
         return rsp
 
 
@@ -222,12 +220,11 @@ def user_add(request,un):
 
         db_insert_pjt(userid)
 
-        pjt_list = ResponsePjt.objects.filter(user_id=userid)
-        project_info_list = pjt_list[0].pjt_info[:-2].split('_:')
-        project_info = []
-        for i in project_info_list:
-            project_info.append(i.split(':_'))
-        request.session['project_info'] = project_info
+        project_info=get_pjts(userid)
+        project_info_json=json.dumps (project_info,cls=CJsonEncoder)
+        project_info_json=json.loads (project_info_json)
+
+        request.session['project_info_json'] = project_info_json
 
         request.session['ver_status'] = '项目' + pjt_name + '创建成功'
         return redirect('/' + username + '/show')
@@ -235,21 +232,24 @@ def user_add(request,un):
         projectform = ProjectNewForm()
 
         email = request.session.get('email')
-        project_info = request.session.get('project_info')
+        project_info_json = request.session.get('project_info_json')
 
-        if not project_info:
+        if not project_info_json:
             userid = request.session.get('userid')
             user = User.objects.filter(id=userid)
             db_insert_pjt(userid)
 
             project_info = get_pjts(userid)
-            request.session['project_info'] = project_info
+            project_info_json=json.dumps (project_info,cls=CJsonEncoder)
+            project_info_json = json.loads(project_info_json)
+
+            request.session['project_info_json'] = project_info_json
 
 
         rsp = render(request, 'weHtml/user_add.html', {'username': username,
                                                        'email': email,
                                                        'projectform': projectform,
-                                                       'project_info': project_info})
+                                                       'project_info_json': project_info_json})
         request.session['ver_status'] = None
         return rsp
 
@@ -264,24 +264,22 @@ def user_del(request,un):
     if request.method == 'GET':
 
         email = request.session.get('email')
-        project_info = request.session.get('project_info')
+        project_info_json = request.session.get('project_info_json')
 
-        if not project_info:
+        if not project_info_json:
             userid = request.session.get('userid')
-            # user = User.objects.filter(id=userid)
             db_insert_pjt(userid)
             project_info = get_pjts(userid)
 
-            # pjt_list = ResponsePjt.objects.filter(user_id=userid)
-            # project_info_list = pjt_list[0].pjt_info[:-2].split('_:')
-            # project_info = []
-            # for i in project_info_list:
-            #     project_info.append(i.split(':_'))
-            request.session['project_info'] = project_info
+
+            project_info_json=json.dumps (project_info,cls=CJsonEncoder)
+            project_info_json = json.loads(project_info_json)
+
+            request.session['project_info_json'] = project_info_json
 
         rsp = render(request, 'weHtml/user_del.html', {'username': username,
                                                        'email': email,
-                                                       'project_info': project_info})
+                                                       'project_info_json': project_info_json})
 
         return rsp
 
@@ -305,12 +303,16 @@ def del_pjt(request,pjt):
         Project.objects.filter(pjt_owner=user[0], pjt_name=pjt).delete()
 
         db_insert_pjt(userid)
-        pjt_list = ResponsePjt.objects.filter(user_id=userid)
-        project_info_list = pjt_list[0].pjt_info[:-2].split('_:')
-        project_info = []
-        for i in project_info_list:
-            project_info.append(i.split(':_'))
-        request.session['project_info'] = project_info
+        # pjt_list = ResponsePjt.objects.filter(user_id=userid)
+        # project_info_list = pjt_list[0].pjt_info[:-2].split('_:')
+        # project_info = []
+        # for i in project_info_list:
+        #     project_info.append(i.split(':_'))
+        project_info=get_pjts (userid)
+        project_info_json=json.dumps (project_info,cls=CJsonEncoder)
+        project_info_json=json.loads (project_info_json)
+
+        request.session['project_info_json'] = project_info_json
 
         return redirect('/' + username + '/del')
 
@@ -358,12 +360,12 @@ def pjt_show(request,un,pjt):
 
 
     print page_info
-    project_info = request.session.get('project_info')
+    project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
 
     return render_to_response('weHtml/user_pjt_show.html',
-                              {'project_info':project_info,
+                              {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
@@ -392,13 +394,13 @@ def pjt_edit(request,un,pjt):
 
     page_info = get_page_info(pjt_on[0].id)
     print page_info
-    project_info = request.session.get('project_info')
+    project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
     # request.session['page_info'] = page_info
 
     return render_to_response('weHtml/user_pjt_edit.html',
-                              {'project_info':project_info,
+                              {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
@@ -427,13 +429,13 @@ def pjt_case(request,un,pjt):
 
     page_info = get_page_info(pjt_on[0].id)
     print page_info
-    project_info = request.session.get('project_info')
+    project_info = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
     # request.session['page_info'] = page_info
 
     return render_to_response('weHtml/user_pjt_case.html',
-                              {'project_info':project_info,
+                              {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
@@ -451,7 +453,7 @@ report
 def rpt_show(request,un,pjt):
     username = request.session.get('username')
 
-    project_info = request.session.get('project_info')
+    project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
 
@@ -487,7 +489,7 @@ def rpt_show(request,un,pjt):
                                               'pjt_id':pjt_on[0].id,
                                               'userid':userid,
                                               'test_case_list': test_case_list,
-                                              'project_info': project_info})
+                                              'project_info_json': project_info_json})
     return rsp
 
 
@@ -497,7 +499,7 @@ def rpt_sum(request,un,pjt):
     print pjt
     username = request.session.get('username')
 
-    project_info = request.session.get('project_info')
+    project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
 
@@ -533,7 +535,7 @@ def rpt_sum(request,un,pjt):
                                               'pjt_id':pjt_on[0].id,
                                               'userid':userid,
                                               'test_case_list': test_case_list,
-                                              'project_info': project_info})
+                                              'project_info_json': project_info_json})
     return rsp
 
 
@@ -543,7 +545,7 @@ def rpt_playback(request,un,pjt):
     print pjt
     username = request.session.get('username')
 
-    project_info = request.session.get('project_info')
+    project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
 
@@ -590,6 +592,6 @@ def rpt_playback(request,un,pjt):
                                               'pjt_id':pjt_on[0].id,
                                               'userid':userid,
                                               'test_case_list': test_case_list,
-                                              'project_info': project_info})
+                                              'project_info_json': project_info_json})
     return rsp
 
