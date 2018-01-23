@@ -5,7 +5,7 @@ from django.db import models
 from userAuth.models import User
 from django.contrib import admin
 from mptt.models import MPTTModel
-import django.utils.timezone as timezone,time
+from django.utils import timezone
 # Create your models here.
 
 
@@ -53,7 +53,7 @@ class Project(models.Model):
     app_file = models.FileField(upload_to='appfile')
     app_plate = models.CharField(max_length=20)
     pjt_owner = models.ForeignKey(User)
-    create_time = models.DateTimeField(default=timezone.now())
+    create_time = models.DateTimeField(default=timezone.now)
     crom_status = models.IntegerField(default=0)
 
     def __unicode__(self):

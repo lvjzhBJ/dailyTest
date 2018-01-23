@@ -28,37 +28,6 @@ class ProjectNewForm(forms.Form):
                                        'lay-verify':'required'}))
 
 
-# @csrf_exempt
-# def project_up(request):
-#     if request.method == 'POST':
-#         projectform = ProjectNewForm(request.POST, request.FILES)
-#
-#         if projectform.is_valid():
-#             pjt_name = projectform.cleaned_data['pjt_name']
-#             app_file = projectform.cleaned_data['app_file']
-#
-#             pjt = Project()
-#             pjt.pjt_name = pjt_name
-#             pjt.app_file = app_file
-#             username = request.COOKIES.get('username', None)
-#             userid = request.COOKIES.get('userid', None)
-#             user = User.objects.filter(username=username, id=userid)
-#             pjt.pjt_owner=user[0]
-#
-#             if str(app_file)[-4:] == '.apk':
-#                 pjt.app_plate = 'Android'
-#                 pjt.save()
-#
-#                 if user:
-#                     pi = get_project_info(user[0])
-#                 response = render_to_response('success.html',{'pi':pi,'username':username,'pi_json':json.dumps(pi)})
-#                 return response
-#     else:
-#         projectform = ProjectNewForm()
-#
-#     return render_to_response('project_up.html', {'projectform': projectform})
-
-
 def get_tree(parent_pjt):
     pages = PageGet.objects.filter(parent=parent_pjt)
     sz = []
@@ -303,11 +272,7 @@ def del_pjt(request,pjt):
         Project.objects.filter(pjt_owner=user[0], pjt_name=pjt).delete()
 
         db_insert_pjt(userid)
-        # pjt_list = ResponsePjt.objects.filter(user_id=userid)
-        # project_info_list = pjt_list[0].pjt_info[:-2].split('_:')
-        # project_info = []
-        # for i in project_info_list:
-        #     project_info.append(i.split(':_'))
+
         project_info=get_pjts (userid)
         project_info_json=json.dumps (project_info,cls=CJsonEncoder)
         project_info_json=json.loads (project_info_json)
@@ -340,8 +305,6 @@ def pjt_show(request,un,pjt):
     if not pjt_on:
         request.session['ver_status'] = '项目' + pjt + '已被删除...'
         return redirect('/' + username)
-
-    # page_info = get_page_info(pjt_on[0].id)
 
     page_info = request.session.get('page_info')
 
