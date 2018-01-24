@@ -54,7 +54,6 @@ def get_tree(parent_pjt):
 
     return sz
 
-
 def get_page_info(pr_id):
 
     pjt = PageGet.objects.filter(parent=None,x_class=pr_id)
@@ -117,6 +116,7 @@ def db_insert_pjt(userid):
         print is_new
         if not is_new:
             pjt.pjt_info=pickle.dumps(project_info)
+            pjt.add_time = pjt.mod_time
             pjt.save()
 
 
@@ -141,10 +141,13 @@ def user_show(request,un):
     if request.method == 'GET':
 
         email = request.session.get('email')
+        userid=request.session.get ('userid')
+
         project_info_json = request.session.get('project_info_json')
 
-        if 1:
-            userid = request.session.get('userid')
+        project_info_db = ResponsePjt.objects.filter(user_id=userid)
+
+        if not project_info_json or (project_info_db and project_info_db[0].add_time != project_info_db[0].mod_time):
             db_insert_pjt(userid)
             project_info = get_pjts(userid)
             project_info_json = json.dumps(project_info,cls=CJsonEncoder)
@@ -155,8 +158,7 @@ def user_show(request,un):
                                                         'email': email,
                                                         'ver_status':ver_status,
                                                         'project_info_json': project_info_json})
-        # request.session['ver_status'] = None
-        print 123
+
         return rsp
 
 
@@ -194,15 +196,11 @@ def user_add(request,un):
         pjt.pjt_owner = user[0]
         if str(app_file)[-4:] == '.apk':
             pjt.app_plate = 'Android'
-            pjt.save()
+        pjt.save()
 
-        db_insert_pjt(userid)
-
-        project_info=get_pjts(userid)
-        project_info_json=json.dumps (project_info,cls=CJsonEncoder)
-        project_info_json=json.loads (project_info_json)
-
-        request.session['project_info_json'] = project_info_json
+        project_info_db = ResponsePjt.objects.filter(user_id=userid)
+        project_info_db[0].mod_time=time.time()
+        project_info_db[0].save()
 
         request.session['ver_status'] = '项目' + pjt_name + '创建成功'
         return redirect('/' + username + '/show')
@@ -212,23 +210,13 @@ def user_add(request,un):
         email = request.session.get('email')
         project_info_json = request.session.get('project_info_json')
 
-        if not project_info_json:
-            userid = request.session.get('userid')
-            user = User.objects.filter(id=userid)
-            db_insert_pjt(userid)
-
-            project_info = get_pjts(userid)
-            project_info_json=json.dumps (project_info,cls=CJsonEncoder)
-            project_info_json = json.loads(project_info_json)
-
-            request.session['project_info_json'] = project_info_json
-
-
         rsp = render(request, 'weHtml/user_add.html', {'username': username,
                                                        'email': email,
                                                        'ver_status':ver_status,
                                                        'projectform': projectform,
-                                                       'project_info_json': project_info_json})
+                                                       'project_info_json': project_info_json
+                                                        })
+
         request.session['ver_status'] = None
         return rsp
 
@@ -246,12 +234,13 @@ def user_del(request,un):
 
         email = request.session.get('email')
         project_info_json = request.session.get('project_info_json')
+        userid=request.session.get ('userid')
 
-        if not project_info_json:
-            userid = request.session.get('userid')
+        project_info_db=ResponsePjt.objects.filter (user_id=userid)
+
+        if not project_info_json or (project_info_db and project_info_db[0].add_time!=project_info_db[0].mod_time):
             db_insert_pjt(userid)
             project_info = get_pjts(userid)
-
 
             project_info_json=json.dumps (project_info,cls=CJsonEncoder)
             project_info_json = json.loads(project_info_json)
