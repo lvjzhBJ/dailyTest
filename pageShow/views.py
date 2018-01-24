@@ -112,8 +112,7 @@ def db_insert_pjt(userid):
         pjt,is_new = ResponsePjt.objects.get_or_create(user_id=userid,
                                                        user_parent=user[0],
                                                        defaults={'pjt_info':pickle.dumps(project_info)})
-        print pjt
-        print is_new
+
         if not is_new:
             pjt.pjt_info=pickle.dumps(project_info)
             pjt.add_time = pjt.mod_time
@@ -143,16 +142,10 @@ def user_show(request,un):
         email = request.session.get('email')
         userid=request.session.get ('userid')
 
-        project_info_json = request.session.get('project_info_json')
-
-        project_info_db = ResponsePjt.objects.filter(user_id=userid)
-
-        if not project_info_json or (project_info_db and project_info_db[0].add_time != project_info_db[0].mod_time):
-            db_insert_pjt(userid)
-            project_info = get_pjts(userid)
-            project_info_json = json.dumps(project_info,cls=CJsonEncoder)
-            project_info_json = json.loads(project_info_json)
-            request.session['project_info_json'] = project_info_json
+        project_info = get_pjts(userid)
+        project_info_json = json.dumps(project_info,cls=CJsonEncoder)
+        project_info_json = json.loads(project_info_json)
+        request.session['project_info_json'] = project_info_json
 
         rsp = render(request, 'weHtml/user_show.html', {'username': username,
                                                         'email': email,
@@ -198,9 +191,7 @@ def user_add(request,un):
             pjt.app_plate = 'Android'
         pjt.save()
 
-        project_info_db = ResponsePjt.objects.filter(user_id=userid)
-        project_info_db[0].mod_time=time.time()
-        project_info_db[0].save()
+        db_insert_pjt(userid)
 
         request.session['ver_status'] = '项目' + pjt_name + '创建成功'
         return redirect('/' + username + '/show')
@@ -233,19 +224,13 @@ def user_del(request,un):
     if request.method == 'GET':
 
         email = request.session.get('email')
-        project_info_json = request.session.get('project_info_json')
         userid=request.session.get ('userid')
 
-        project_info_db=ResponsePjt.objects.filter (user_id=userid)
+        project_info = get_pjts(userid)
+        project_info_json=json.dumps (project_info,cls=CJsonEncoder)
+        project_info_json = json.loads(project_info_json)
 
-        if not project_info_json or (project_info_db and project_info_db[0].add_time!=project_info_db[0].mod_time):
-            db_insert_pjt(userid)
-            project_info = get_pjts(userid)
-
-            project_info_json=json.dumps (project_info,cls=CJsonEncoder)
-            project_info_json = json.loads(project_info_json)
-
-            request.session['project_info_json'] = project_info_json
+        request.session['project_info_json'] = project_info_json
         rsp = render(request, 'weHtml/user_del.html', {'username': username,
                                                        'email': email,
                                                        'ver_status':ver_status,
@@ -268,18 +253,11 @@ def del_pjt(request,pjt):
         project_db_old = Project.objects.filter(pjt_owner=user[0],pjt_name = pjt)
         if not project_db_old:
             request.session['ver_status'] = 'FAIL_项目不存在,请重试...'
-            # return redirect('/' + username + '/del/')
         else:
             PageGet.objects.filter(parent=None,x_class=project_db_old[0].id).delete()
         Project.objects.filter(pjt_owner=user[0], pjt_name=pjt).delete()
         ResponsePjt.objects.filter(user_parent=user[0], user_id=userid).delete()
         db_insert_pjt(userid)
-
-        project_info=get_pjts (userid)
-        project_info_json=json.dumps (project_info,cls=CJsonEncoder)
-        project_info_json=json.loads (project_info_json)
-
-        request.session['project_info_json'] = project_info_json
 
         return redirect('/' + username + '/del')
 
@@ -311,8 +289,7 @@ def pjt_show(request,un,pjt):
     page_info = request.session.get('page_info')
 
     get_page_info(pjt_on[0].id)
-    print pjt_on
-    print pjt_on[0].id
+
     if not page_info:
 
         page_list = ResponsePage.objects.filter(pjt_id=pjt_on[0].id)

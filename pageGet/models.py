@@ -70,7 +70,7 @@ class ResponsePjt(models.Model):
     user_id = models.IntegerField(default=0)
     pjt_info = models.CharField(max_length=4096,null=True)
     add_time = models.DateTimeField('添加日期',default = timezone.now)
-    mod_time = models.DateTimeField('更新日期',default = timezone.now)
+    mod_time = models.DateTimeField('更新日期',auto_now_add=True)
     user_parent = models.ForeignKey(User,default=None)
 
 
