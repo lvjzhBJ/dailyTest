@@ -139,11 +139,13 @@ def db_insert_pjt(userid):
 
     user = User.objects.filter(id=userid)
     project_info = list(Project.objects.filter(pjt_owner=user).values('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status'))
-
+    print project_info
     if project_info:
         pjt,is_new = ResponsePjt.objects.get_or_create(user_id=userid,
                                                        user_parent=user[0],
                                                        defaults={'pjt_info':pickle.dumps(project_info)})
+        print pjt
+        print is_new
         if not is_new:
             pjt.pjt_info=pickle.dumps(project_info)
             pjt.save()
@@ -161,6 +163,8 @@ def get_pjts(userid):
 @csrf_exempt
 def user_show(request,un):
     username = request.session.get('username')
+    ver_status=request.session.get ('ver_status')
+
     if un != username:
         request.session['ver_status'] = 'FAIL_用登录失效...'
         return redirect('/login')
@@ -180,13 +184,18 @@ def user_show(request,un):
 
         rsp = render(request, 'weHtml/user_show.html', {'username': username,
                                                         'email': email,
+                                                        'ver_status':ver_status,
                                                         'project_info_json': project_info_json})
+        # request.session['ver_status'] = None
+        print 123
         return rsp
 
 
 @csrf_exempt
 def user_add(request,un):
     username = request.session.get('username')
+    ver_status=request.session.get ('ver_status')
+
     if un != username:
         request.session['ver_status'] = 'FAIL_用登录失效...'
         return redirect('/login')
@@ -248,6 +257,7 @@ def user_add(request,un):
 
         rsp = render(request, 'weHtml/user_add.html', {'username': username,
                                                        'email': email,
+                                                       'ver_status':ver_status,
                                                        'projectform': projectform,
                                                        'project_info_json': project_info_json})
         request.session['ver_status'] = None
@@ -257,6 +267,8 @@ def user_add(request,un):
 @csrf_exempt
 def user_del(request,un):
     username = request.session.get('username')
+    ver_status=request.session.get ('ver_status')
+
     if un != username:
         request.session['ver_status'] = 'FAIL_用登录失效...'
         return redirect('/login')
@@ -276,38 +288,35 @@ def user_del(request,un):
             project_info_json = json.loads(project_info_json)
 
             request.session['project_info_json'] = project_info_json
-
         rsp = render(request, 'weHtml/user_del.html', {'username': username,
                                                        'email': email,
+                                                       'ver_status':ver_status,
                                                        'project_info_json': project_info_json})
-
         return rsp
 
 
 @csrf_exempt
 def del_pjt(request,pjt):
+
     if request.method == 'GET':
         username = request.session.get('username')
         userid = request.session.get('userid')
         user = User.objects.filter(username=username, id=userid)
+
         if not user:
             request.session['ver_status'] = 'FAIL_用户失效,请重新登录...'
-            return redirect('/' + username)
+            return redirect('/' + username + '/del/')
 
         project_db_old = Project.objects.filter(pjt_owner=user[0],pjt_name = pjt)
         if not project_db_old:
             request.session['ver_status'] = 'FAIL_项目不存在,请重试...'
-            return redirect('/' + username)
-
-        PageGet.objects.filter(parent=None,x_class=project_db_old[0].id).delete()
+            # return redirect('/' + username + '/del/')
+        else:
+            PageGet.objects.filter(parent=None,x_class=project_db_old[0].id).delete()
         Project.objects.filter(pjt_owner=user[0], pjt_name=pjt).delete()
-
+        ResponsePjt.objects.filter(user_parent=user[0], user_id=userid).delete()
         db_insert_pjt(userid)
-        # pjt_list = ResponsePjt.objects.filter(user_id=userid)
-        # project_info_list = pjt_list[0].pjt_info[:-2].split('_:')
-        # project_info = []
-        # for i in project_info_list:
-        #     project_info.append(i.split(':_'))
+
         project_info=get_pjts (userid)
         project_info_json=json.dumps (project_info,cls=CJsonEncoder)
         project_info_json=json.loads (project_info_json)

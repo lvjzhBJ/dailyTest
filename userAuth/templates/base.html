@@ -67,6 +67,10 @@
     </ul>
   </div>
 </div>
+
+
+{% block body-base %}{% endblock %}
+
 {% if ver_status %}
     <blockquote class="layui-elem-quote layui-quote-nm">
 {#<div class="layui-anim layui-anim-up">#}
@@ -74,10 +78,6 @@
 {#</div>#}
     </blockquote>
 {% endif %}
-
-{% block body-base %}{% endblock %}
-
-
 <div class="fly-footer">
   <p><a href="/" target="_blank">Fly社区</a> 2017 &copy; <a href="/" target="_blank">layui.com 出品</a></p>
   <p>

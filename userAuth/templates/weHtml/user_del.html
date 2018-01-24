@@ -15,14 +15,14 @@
             {% if project_info_json %}
                 <table class="layui-table" id="table_del"><colgroup>
                     <col width="25"><col width="25"><col><col width="10"><col></colgroup>
-                    <thead><tr><th>序号</th><th>项目</th><th>安装包名</th><th>DEL</th></tr></thead>
+                    <thead><tr><th>ID</th><th>项目</th><th>安装包名</th><th>DEL</th></tr></thead>
                     <tbody>
                     {% for i in project_info_json %}
                         <tr><td>{{ i.id }}</td>
                             <td>{{ i.pjt_name }}</td>
                             <td>{{ i.app_file }}</td>
                             <td>
-                                <a class="layui-btn layui-btn-sm" onclick="deleteRow(this,'{{ i.1 }}')">
+                                <a class="layui-btn layui-btn-sm" onclick="deleteRow(this,'{{ i.pjt_name }}')">
                                     <i class="layui-icon">&#xe640;</i>
                                 </a>
                             </td>
@@ -49,10 +49,8 @@
             btn: ['删除项目', '放弃'] //可以无限个按钮
             , btn1: function () {
             layer.closeAll();
-            alert('234');
         }
         }, function () {
-            alert('2324');
             var i=r.parentNode.parentNode.rowIndex;
             document.getElementById('table_del').deleteRow(i);
             layer.closeAll();

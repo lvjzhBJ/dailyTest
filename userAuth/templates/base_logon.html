@@ -44,11 +44,11 @@
             {% if project_info_json %}
               {% for i in project_info_json %}
                 <dd>
-                    <div class="layui-col-md8"><a href="/{{ username }}/{{ i.1 }}/show">
-                    <i class="layui-icon">&#xe62e;{{ i.1 }}</i></a></div>
+                    <div class="layui-col-md8"><a href="/{{ username }}/{{ i.pjt_name }}/show">
+                    <i class="layui-icon">&#xe62e;{{ i.pjt_name }}</i></a></div>
 
-                    <span><i class="layui-icon"><a href="/{{ username }}/{{ i.1 }}/report/show" class="fly-link">&#xe705;
-                    {% if i.3 == 2  %}
+                    <span><i class="layui-icon"><a href="/{{ username }}/{{ i.pjt_name }}/report/show" class="fly-link">&#xe705;
+                    {% if i.crom_status == 2  %}
                         <span class="layui-badge-dot"></span>
                     {% endif %}
                     </a></i></span>
