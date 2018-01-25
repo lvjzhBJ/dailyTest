@@ -90,15 +90,15 @@ class UserForm(forms.Form):
                                         'lay-verify':'required'}))
 
 
-def get_project_info(user):
-    pi = []
-    pjt = Project.objects.filter(pjt_owner__exact=user)
-    if pjt:
-        for i in pjt:
-            pi.append({'id': i.id, 'name': i.pjt_name, 'parent': 0})
-    else:
-        pi.append({'id': -1, 'name': '请添加项目', 'parent': 0})
-    return pi
+# def get_project_info(user):
+#     pi = []
+#     pjt = Project.objects.filter(pjt_owner__exact=user)
+#     if pjt:
+#         for i in pjt:
+#             pi.append({'id': i.id, 'name': i.pjt_name, 'parent': 0})
+#     else:
+#         pi.append({'id': -1, 'name': '请添加项目', 'parent': 0})
+#     return pi
 
 
 @csrf_exempt

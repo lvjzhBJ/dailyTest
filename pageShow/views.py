@@ -8,7 +8,7 @@ from django import forms
 from PIL import Image
 from django.shortcuts import render,render_to_response,HttpResponse,redirect
 from userAuth.models import User
-from userAuth.views import get_project_info
+# from userAuth.views import get_project_info
 from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt
 from images2gif import writeGif
 from django.views.decorators.csrf import csrf_exempt
@@ -266,6 +266,13 @@ def del_pjt(request,pjt):
 project
 '''
 
+def get_pages(pjt_id):
+    page_tree = ResponsePage.objects.filter(pjt_id=pjt_id)
+
+    if len(page_tree) == 1:
+        return pickle.loads(page_tree.values('page_info')[0]['page_info'])
+    else:
+        return None
 
 @csrf_exempt
 def pjt_show(request,un,pjt):
@@ -286,34 +293,24 @@ def pjt_show(request,un,pjt):
         request.session['ver_status'] = '项目' + pjt + '已被删除...'
         return redirect('/' + username)
 
-    page_info = request.session.get('page_info')
+    if request.method == 'GET':
 
-    get_page_info(pjt_on[0].id)
+        project_info_json = request.session.get('project_info_json')
+        email = request.session.get('email')
+        userid = request.session.get('userid')
 
-    if not page_info:
+        page_info = get_pages(pjt_on[0].id)
+        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
+        request.session['page_info_json'] = page_info_json
 
-        page_list = ResponsePage.objects.filter(pjt_id=pjt_on[0].id)
-        print page_list
-        page_info_list = page_list[0].page_info[:-2].split('_:')
-        page_info = []
-        for i in page_info_list:
-            page_info.append(i.split(':_'))
-        request.session['page_info'] = page_info
-
-
-    print page_info
-    project_info_json = request.session.get('project_info_json')
-    email = request.session.get('email')
-    userid = request.session.get('userid')
-
-    return render_to_response('weHtml/user_pjt_show.html',
-                              {'project_info_json':project_info_json,
-                                       'email':email,
-                                       'username':username,
-                                       'pjt':pjt,
-                                       'pjt_id':pjt_on[0].id,
-                                       'userid':userid,
-                                       'page_info':json.dumps(page_info)})
+        return render_to_response('weHtml/user_pjt_show.html',
+                                  {'project_info_json':project_info_json,
+                                   'userid': userid,
+                                   'username':username,
+                                   'email': email,
+                                   'pjt':pjt,
+                                   'pjt_id':pjt_on[0].id,
+                                   'page_info':page_info_json})
 
 
 @csrf_exempt
@@ -334,15 +331,18 @@ def pjt_edit(request,un,pjt):
         request.session['ver_status'] = '项目' + pjt + '已被删除...'
         return redirect('/' + username)
 
-    page_info = get_page_info(pjt_on[0].id)
-    print page_info
-    project_info_json = request.session.get('project_info_json')
-    email = request.session.get('email')
-    userid = request.session.get('userid')
-    # request.session['page_info'] = page_info
+    if request.method == 'GET':
 
-    return render_to_response('weHtml/user_pjt_edit.html',
-                              {'project_info_json':project_info_json,
+        project_info_json = request.session.get('project_info_json')
+        email = request.session.get('email')
+        userid = request.session.get('userid')
+
+        page_info = get_pages(pjt_on[0].id)
+        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
+        request.session['page_info_json'] = page_info_json
+
+        return render_to_response('weHtml/user_pjt_edit.html',
+                                    {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
@@ -369,21 +369,24 @@ def pjt_case(request,un,pjt):
         request.session['ver_status'] = '项目' + pjt + '已被删除...'
         return redirect('/' + username)
 
-    page_info = get_page_info(pjt_on[0].id)
-    print page_info
-    project_info = request.session.get('project_info_json')
-    email = request.session.get('email')
-    userid = request.session.get('userid')
-    # request.session['page_info'] = page_info
+    if request.method == 'GET':
 
-    return render_to_response('weHtml/user_pjt_case.html',
-                              {'project_info_json':project_info_json,
+        project_info_json = request.session.get('project_info_json')
+        email = request.session.get('email')
+        userid = request.session.get('userid')
+
+        page_info = get_pages(pjt_on[0].id)
+        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
+        request.session['page_info_json'] = page_info_json
+
+        return render_to_response('weHtml/user_pjt_case.html',
+                                        {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
                                        'pjt_id':pjt_on[0].id,
                                        'userid':userid,
-                                       'page_info':json.dumps(page_info)})
+                                       'page_info':page_info_json})
 
 
 '''
