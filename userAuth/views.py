@@ -6,7 +6,7 @@ import time
 from django.shortcuts import HttpResponse,render_to_response,render,redirect
 from django import forms
 from models import User
-from pageGet.models import Project
+from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from utils.email_send import send_register_email
@@ -224,6 +224,9 @@ add cookis
 '''
 @csrf_exempt
 def index(request):
+    send_mail('Subject here', 'Here is the message.', 'lv_jz@163.com',
+              ['32540591@qq.com'], fail_silently=False)
+
     return render(request, 'weHtml/index.html')
 
 
