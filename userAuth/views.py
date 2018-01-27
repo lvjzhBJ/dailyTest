@@ -128,6 +128,7 @@ def regist(request):
             user,is_new = User.objects.get_or_create(username=username,password=password,email=email,phone=phone)
             if is_new:
                 send_register_email(email, "register")
+
                 userform=UserForm()
                 return render_to_response('weHtml/login.html', {'userform': userform})
             else:
