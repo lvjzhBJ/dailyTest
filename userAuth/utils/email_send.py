@@ -1,10 +1,12 @@
 #coding=utf-8
 import traceback
+import logging
 from random import Random
 from django.core.mail import send_mail
 from userAuth.models import EmailVerifyRecord,User
 from dailyTest.settings import EMAIL_FROM
 
+logger = logging.getLogger("django")  # 为loggers中定义的名称
 
 def random_str(randomlength=8):
     str = ''
@@ -26,12 +28,16 @@ def send_register_email(email, send_type="register"):
         email_record.send_type = send_type
         email_record.save()
 
+        logger.debug(email_record)
+
         # 如果为注册类型
         if send_type == "register":
             email_title = "注册激活链接"
             email_body = "请点击下面的链接激活你的账号:http://127.0.0.1:8000/active/{0}".format(code)
             # 发送邮件
+            logger.debug(email_body)
             send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
+            logger.debug(send_status)
             if send_status:
                 pass
         elif send_type == "forget":
@@ -43,7 +49,4 @@ def send_register_email(email, send_type="register"):
             if send_status:
                 pass
     except:
-        import logging
-        logger = logging.getLogger("django")  # 为loggers中定义的名称
-        logger.info("some info...")
-        logger.error(traceback.format_exc())
+        logger.debug(traceback.format_exc())

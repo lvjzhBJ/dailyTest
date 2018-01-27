@@ -99,7 +99,6 @@ def refresh_captcha(request):
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
-
 @csrf_exempt
 def regist(request):
 
