@@ -89,18 +89,6 @@ class UserForm(forms.Form):
                                         'class':'layui-input',
                                         'lay-verify':'required'}))
 
-
-# def get_project_info(user):
-#     pi = []
-#     pjt = Project.objects.filter(pjt_owner__exact=user)
-#     if pjt:
-#         for i in pjt:
-#             pi.append({'id': i.id, 'name': i.pjt_name, 'parent': 0})
-#     else:
-#         pi.append({'id': -1, 'name': '请添加项目', 'parent': 0})
-#     return pi
-
-
 @csrf_exempt
 def refresh_captcha(request):
     to_json_response = dict()
@@ -137,15 +125,17 @@ def regist(request):
                 request.session['ver_status'] = '验证码输入错误,请重试'
                 return redirect('/regist')
 
-            user = User()
-            user.email=email
-            user.phone=regform.cleaned_data['phone']
-            user.username=regform.cleaned_data['username']
-            user.password=regform.cleaned_data['password']
-            user.save()
-            send_register_email(email, "register")
-            userform=UserForm()
-            return render_to_response('weHtml/login.html', {'userform': userform})
+            phone=regform.cleaned_data['phone']
+            username=regform.cleaned_data['username']
+            password=regform.cleaned_data['password']
+            user,is_new = User.objects.get_or_create(username=username,password=password,email=email,phone=phone)
+            if is_new:
+                send_register_email(email, "register")
+                userform=UserForm()
+                return render_to_response('weHtml/login.html', {'userform': userform})
+            else:
+                request.session['ver_status'] = '用户已存在'
+                return redirect('/login')
 
     reg_form = RegForm()
     ver_form = VerForm()
