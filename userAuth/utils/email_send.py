@@ -38,9 +38,12 @@ def send_register_email(email, send_type="register"):
             user=User.objects.get(email=email)
             email_title = "get pwd"
             email_body = ("pwd:"+user.password).format(code)
-            # 发送邮件
+
             send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
             if send_status:
                 pass
-    except Exception, e:
-        traceback.format_exc()
+    except:
+        import logging
+        logger = logging.getLogger("django")  # 为loggers中定义的名称
+        logger.info("some info...")
+        logger.error(traceback.format_exc())
