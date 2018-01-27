@@ -127,12 +127,7 @@ def regist(request):
             password=regform.cleaned_data['password']
             user,is_new = User.objects.get_or_create(username=username,password=password,email=email,phone=phone)
             if is_new:
-                try:
-                    send_register_email(email, "register")
-                except:
-                    request.session['ver_status'] = '邮件发送失败....'
-                    return redirect('/regist')
-
+                send_register_email(email, "register")
                 userform=UserForm()
                 return render_to_response('weHtml/login.html', {'userform': userform})
             else:
