@@ -177,10 +177,12 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pageGet/media').replace('\\', '/')
 MEDIA_URL = '/pageGet/media/'
 
+
+EMAIL_USE_SSL = True
 EMAIL_HOST = "smtp.163.com"
-EMAIL_PORT = 25
+EMAIL_PORT = 465
 EMAIL_HOST_USER = "lv_jz@163.com"
 EMAIL_HOST_PASSWORD = "1@#qweAsdz"
-EMAIL_USE_TLS = False
-EMAIL_FROM = "lv_jz@163.com"
-
+# EMAIL_USE_TLS = False
+# EMAIL_FROM = "lv_jz@163.com"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
