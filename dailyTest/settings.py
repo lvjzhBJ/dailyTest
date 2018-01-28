@@ -190,9 +190,9 @@ MEDIA_URL = '/pageGet/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_USE_TLS = False
+EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.163.com'
-EMAIL_PORT = 587
+EMAIL_PORT = 465
 EMAIL_HOST_USER = 'lv_jz@163.com'
 EMAIL_HOST_PASSWORD = '1@#qweAsdz'
 DEFAULT_FROM_EMAIL = 'lv_jz@163.com'
