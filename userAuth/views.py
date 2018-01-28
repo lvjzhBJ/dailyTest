@@ -224,8 +224,7 @@ add cookis
 '''
 @csrf_exempt
 def index(request):
-    send_mail('Subject here', 'Here is the message.', 'lv_jz@163.com',
-              ['32540591@qq.com'], fail_silently=False)
+    # send_mail('Subject here', 'Here is the message.', 'lv_jz@163.com',['32540591@qq.com'], fail_silently=False)
 
     return render(request, 'weHtml/index.html')
 
