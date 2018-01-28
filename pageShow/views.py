@@ -8,7 +8,6 @@ from django import forms
 from PIL import Image
 from django.shortcuts import render,render_to_response,HttpResponse,redirect
 from userAuth.models import User
-# from userAuth.views import get_project_info
 from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt
 from images2gif import writeGif
 from django.views.decorators.csrf import csrf_exempt

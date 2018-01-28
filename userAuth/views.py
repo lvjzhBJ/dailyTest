@@ -212,9 +212,9 @@ def active_user(request, active_code):
             user = User.objects.get(email=email)
             user.is_active = True
             user.save()
-            request.session['ver_status'] = '用户激活失败'
+            request.session['ver_status'] = '用户激活成功'
     else:
-        request.session['ver_status'] = '用户激活成功'
+        request.session['ver_status'] = '用户激活失败'
 
     return redirect('/login')
 
