@@ -41,14 +41,14 @@ def send_register_email(email, send_type="register"):
             # 发送邮件
             logger.debug(email_title)
             logger.debug(email)
-            # send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
-            # logger.debug(send_status)
-            msg = EmailMultiAlternatives(email_title,email_body_text, from_email, [email])
-
-            msg.attach_alternative(email_body_html, "text/html")
-
-            send_status = msg.send()
+            send_status = send_mail(email_title, email_body_html, from_email, [email])
             logger.debug(send_status)
+            # msg = EmailMultiAlternatives(email_title,email_body_text, from_email, [email])
+            #
+            # msg.attach_alternative(email_body_html, "text/html")
+
+            # send_status = msg.send()
+            # logger.debug(send_status)
 
             if send_status:
                 pass

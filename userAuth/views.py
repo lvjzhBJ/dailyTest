@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-import re,hashlib
+import re
 import time
-from django.shortcuts import HttpResponse,render_to_response,render,redirect
 from django import forms
 from models import User
-from django.core.mail import send_mail
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ValidationError
+from captcha.models import CaptchaStore
 from utils.email_send import send_register_email
 from userAuth.models import EmailVerifyRecord
-from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
+from django.core.exceptions import ValidationError
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import HttpResponse,render_to_response,render,redirect
+
 
 
 # Create your views here.
@@ -224,7 +224,6 @@ add cookis
 '''
 @csrf_exempt
 def index(request):
-    send_mail('Subject here', 'Here is the message.', 'lv_jz@163.com',['32540591@qq.com'], fail_silently=False)
 
     return render(request, 'weHtml/index.html')
 
