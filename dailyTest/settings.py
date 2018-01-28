@@ -178,21 +178,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'pageGet/media').replace('\\', '/')
 MEDIA_URL = '/pageGet/media/'
 
 
-# EMAIL_USE_SSL = True
-# EMAIL_HOST = "smtp.163.com"
-# EMAIL_PORT = 465
-# EMAIL_HOST_USER = "lv_jz@163.com"
-# EMAIL_HOST_PASSWORD = "1@#qweAsdz"
-# EMAIL_USE_TLS = False
-# EMAIL_FROM = "lv_jz@163.com"
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'lv_jz@163.com'
 EMAIL_HOST_PASSWORD = '1@#qweAsdz'
-DEFAULT_FROM_EMAIL = 'lv_jz@163.com'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
