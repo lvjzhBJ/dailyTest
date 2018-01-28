@@ -1,10 +1,11 @@
 #coding=utf-8
 import traceback
 import logging
+import socket
 from random import Random
 from django.core.mail import send_mail
 from userAuth.models import EmailVerifyRecord,User
-from django.core.mail import EmailMultiAlternatives
+# from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
 
@@ -36,8 +37,9 @@ def send_register_email(email, send_type="register"):
         # 如果为注册类型
         if send_type == "register":
             email_title = "注册激活链接"
-            email_body_text = "123"
-            email_body_html = "请点击下面的链接激活你的账号:http://127.0.0.1:8000/active/{0}".format(code)
+            # email_body_text = "123"
+            ip = socket.gethostbyname(socket.gethostname())
+            email_body_html = "请点击下面的链接激活你的账号:http://"+ip+"/active/{0}".format(code)
             # 发送邮件
             logger.debug(email_title)
             logger.debug(email)
