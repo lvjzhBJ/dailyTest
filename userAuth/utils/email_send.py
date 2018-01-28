@@ -32,12 +32,12 @@ def send_register_email(email, send_type="register"):
 
         logger.debug(email_record)
         from_email = settings.DEFAULT_FROM_EMAIL
-
+        send_ip = settings.EMAIL_SEND_IP
         # 如果为注册类型
         if send_type == "register":
             email_title = "注册激活链接"
             # email_body_text = "123"
-            email_body_html = "请点击下面的链接激活你的账号:http://47.93.220.141/active/{0}".format(code)
+            email_body_html = "请点击下面的链接激活你的账号:http://"+send_ip+"/active/{0}".format(code)
             # 发送邮件
             logger.debug(email_title)
             logger.debug(email)

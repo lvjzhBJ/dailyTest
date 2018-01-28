@@ -177,7 +177,12 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pageGet/media').replace('\\', '/')
 MEDIA_URL = '/pageGet/media/'
 
+if DEBUG == 'on':
+    local_ip = '127.0.0.1'
+else:
+    local_ip = '47.93.220.141'
 
+EMAIL_SEND_IP = local_ip
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 465
