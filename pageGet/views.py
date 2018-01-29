@@ -16,6 +16,7 @@ def pjt2client(request):
             print pjt_on[0]
             pjt_dict = {'id':pjt_on[0].id,
                         'pjt_name':pjt_on[0].pjt_name,
+                        'app_file':str(pjt_on[0].app_file),
                         'app_plate':pjt_on[0].app_plate,
                         'pjt_owner':pjt_on[0].pjt_owner.id}
             rsp = JsonResponse(pjt_dict, safe=False)
