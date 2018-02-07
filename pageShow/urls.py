@@ -28,5 +28,6 @@ urlpatterns = [
     url(r'^(\S+)/(\S+)/case/$', views.pjt_case),
     url(r'^(\S+)/show/$', views.user_show),
     url(r'^(\S+)/add/$', views.user_add),
+    url(r'^(\S+)/new/$', views.user_new),
     url(r'^(\S+)/del/$', views.user_del),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

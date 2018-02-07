@@ -27,6 +27,25 @@ class ProjectNewForm(forms.Form):
                                        'lay-verify':'required'}))
 
 
+class ProjectForm(forms.Form):
+    pjt_name = forms.CharField(required=True,
+                               label='项目名称',
+                               max_length=20
+                               ,widget=forms.TextInput(attrs={
+                                        'type': 'text',
+                                       'class':'layui-input',
+                                       'lay-verify':'required'}))
+
+    apk_path = forms.CharField (required=True,
+                                label='安装包'
+                                ,widget=forms.TextInput(attrs={
+                                        'id':       'oss_apk',
+                                        'readonly': 'readonly',
+                                        'type':      'text',
+                                        'class':     'layui-input',
+                                        'lay-verify':'required'}))
+
+
 def get_tree(parent_pjt):
     pages = PageGet.objects.filter(parent=parent_pjt)
     sz = []
@@ -208,6 +227,63 @@ def user_add(request,un):
                                                         })
 
         request.session['ver_status'] = None
+        return rsp
+
+
+@csrf_exempt
+def user_new(request,un):
+    username=request.session.get ('username')
+    ver_status=request.session.get ('ver_status')
+
+    if un!=username:
+        request.session['ver_status']='FAIL_用登录失效...'
+        return redirect ('/login')
+
+    if request.method=='POST':
+        projectform=ProjectForm(request.POST,request.FILES)
+
+        if not projectform.is_valid ():
+            request.session['ver_status']='FAIL_请输入项目名称...'
+            return redirect ('/'+username+'/show')
+
+        pjt_name=projectform.cleaned_data['pjt_name']
+        # app_file=request.FILES.get ('file',None)
+
+        # if not app_file:
+        #     request.session['ver_status']='FAIL_请选择安装包文件...'
+        #     return redirect ('/'+username+'/show')
+
+        pjt=Project()
+        pjt.pjt_name=pjt_name
+        # pjt.app_file=app_file
+        userid=request.session.get ('userid')
+        user=User.objects.filter (username=username,id=userid)
+        if not user:
+            request.session['ver_status']='FAIL_账户异常,请重新登录...'
+            return redirect ('/'+username+'/show')
+        pjt.pjt_owner=user[0]
+        # if str (app_file)[-4:]=='.apk':
+        #     pjt.app_plate='Android'
+        pjt.save ()
+
+        db_insert_pjt(userid)
+
+        request.session['ver_status']='项目'+pjt_name+'创建成功'
+        return redirect ('/'+username+'/show')
+    else:
+        projectform=ProjectForm()
+
+        email=request.session.get ('email')
+        project_info_json=request.session.get('project_info_json')
+
+        rsp=render (request,'weHtml/user_new.html',{'username':         username,
+                                                    'email':            email,
+                                                    'ver_status':       ver_status,
+                                                    'projectform':      projectform,
+                                                    'project_info_json':project_info_json
+                                                    })
+
+        request.session['ver_status']=None
         return rsp
 
 
