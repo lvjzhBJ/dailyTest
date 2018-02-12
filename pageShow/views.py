@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from userAuth.utils.time2json import CJsonEncoder
 
 reload(sys)
+
 sys.setdefaultencoding('utf8')
 
 
@@ -71,6 +72,7 @@ def get_tree(parent_pjt):
                    "children": get_tree(pg.id)})
 
     return sz
+
 
 def get_page_info(pr_id):
 
@@ -477,76 +479,42 @@ def rpt_show(request,un,pjt):
     email = request.session.get('email')
     userid = request.session.get('userid')
 
-    user_pjt = User.objects.filter(username=username)
-    pjt_on = Project.objects.filter(pjt_name=pjt,pjt_owner=user_pjt[0])
-    pjt_list = PageGet.objects.filter(parent=None,x_class=pjt_on[0].id)
-    test_case_list=[]
+    pjt_on = Project.objects.filter(pjt_name=pjt)
+    rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
 
-    def get_rpt_case(parent_pjt,test_case =[]):
-
-        pages = PageGet.objects.filter(parent=parent_pjt)
-        if pages:
-            for i in pages:
-                test_case=test_case+[{'id':i.id,
-                                      'resource_id':i.resource_id,
-                                      'is_run_error':i.is_run_error,
-                                      'operation':i.operation}]
-                get_rpt_case(i,test_case)
-                test_case = test_case[:-1]
-        else:
-            test_case_list.append(test_case)
-
-        return test_case_list
-
-    test_case_list = get_rpt_case(pjt_list)
-
-    we_path = 'pageGet/media/img/user' + str(userid) + '/pjt' + str(pjt_on[0].id)+'/'
+    test_case_info = {}
+    test_case_info['status'] = 0
+    if rpt:
+        test_case_info['status'] = 1
+        test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
 
     rsp = render(request, 'weHtml/rpt_show.html', {'username': username,
-                                              'email': email,
-                                              'pjt': pjt,
-                                              'rpt':'报告',
-                                              'pjt_id':pjt_on[0].id,
-                                              'userid':userid,
-                                              'test_case_list': test_case_list,
-                                              'project_info_json': project_info_json})
+                                                   'email': email,
+                                                   'pjt': pjt,
+                                                   'rpt':'报告',
+                                                   'pjt_id':pjt_on[0].id,
+                                                   'userid':userid,
+                                                   'test_case_info': test_case_info,
+                                                   'project_info_json': project_info_json})
     return rsp
 
 
 @csrf_exempt
 def rpt_sum(request,un,pjt):
-    print un
-    print pjt
     username = request.session.get('username')
 
     project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
 
-    print '_____' * 8
+    pjt_on = Project.objects.filter(pjt_name=pjt)
+    rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
 
-    user_pjt = User.objects.filter(username=un)
-    pjt_on = Project.objects.filter(pjt_name=pjt,pjt_owner=user_pjt[0])
-    pjt_list = PageGet.objects.filter(parent=None,x_class=pjt_on[0].id)
-    test_case_list=[]
-
-    def get_rpt_case(parent_pjt,test_case =[]):
-
-        pages = PageGet.objects.filter(parent=parent_pjt)
-        if pages:
-            for i in pages:
-                test_case=test_case+[{'id':i.id,
-                                      'resource_id':i.resource_id,
-                                      'is_run_error':i.is_run_error,
-                                      'operation':i.operation}]
-                get_rpt_case(i,test_case)
-                test_case = test_case[:-1]
-        else:
-            test_case_list.append(test_case)
-
-        return test_case_list
-
-    test_case_list = get_rpt_case(pjt_list)
+    test_case_info={}
+    test_case_info['status'] = 0
+    if rpt:
+        test_case_info['status'] = 1
+        test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
 
     rsp = render(request, 'weHtml/rpt_sum.html', {'username': username,
                                               'email': email,
@@ -554,64 +522,35 @@ def rpt_sum(request,un,pjt):
                                               'rpt':'报告',
                                               'pjt_id':pjt_on[0].id,
                                               'userid':userid,
-                                              'test_case_list': test_case_list,
+                                              'test_case_info': test_case_info,
                                               'project_info_json': project_info_json})
     return rsp
 
 
 @csrf_exempt
 def rpt_playback(request,un,pjt):
-    print un
-    print pjt
     username = request.session.get('username')
 
     project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
 
-    # page_info = request.session.get('page_info')
-    print '_____' * 8
+    pjt_on = Project.objects.filter(pjt_name=pjt)
+    rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
 
-    user_pjt = User.objects.filter(username=un)
-    pjt_on = Project.objects.filter(pjt_name=pjt,pjt_owner=user_pjt[0])
-    pjt_list = PageGet.objects.filter(parent=None,x_class=pjt_on[0].id)
-    test_case_list=[]
-
-    def get_rpt_case(parent_pjt,test_case =[]):
-
-        pages = PageGet.objects.filter(parent=parent_pjt)
-        if pages:
-            for i in pages:
-                test_case=test_case+[{'id':i.id,
-                                      'resource_id':i.resource_id,
-                                      'is_run_error':i.is_run_error,
-                                      'operation':i.operation}]
-                get_rpt_case(i,test_case)
-                test_case = test_case[:-1]
-        else:
-            test_case_list.append(test_case)
-
-        return test_case_list
-
-    test_case_list = get_rpt_case(pjt_list)
-
-    we_path = 'pageGet/media/img/user' + str(userid) + '/pjt' + str(pjt_on[0].id)+'/'
-
-    for i in test_case_list:
-
-        im_list =[Image.open(we_path+'bo_'+str(j['id'])+'.jpg') for j in i]
-
-        filename = ''.join([str(j['id']) for j in i])+".gif"
-        if not os.path.exists(we_path+filename):
-            writeGif(we_path+filename,im_list,duration=1.5,subRectangles=False)
+    test_case_info={}
+    test_case_info['status'] = 0
+    if rpt:
+        test_case_info['status'] = 1
+        test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
 
     rsp = render(request, 'weHtml/rpt_playback.html', {'username': username,
-                                              'email': email,
-                                              'pjt': pjt,
-                                              'rpt':'报告',
-                                              'pjt_id':pjt_on[0].id,
-                                              'userid':userid,
-                                              'test_case_list': test_case_list,
-                                              'project_info_json': project_info_json})
+                                                       'email': email,
+                                                       'pjt': pjt,
+                                                       'rpt':'报告',
+                                                       'pjt_id':pjt_on[0].id,
+                                                       'userid':userid,
+                                                       'test_case_info': test_case_info,
+                                                       'project_info_json': project_info_json})
     return rsp
 

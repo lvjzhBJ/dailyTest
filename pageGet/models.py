@@ -36,17 +36,6 @@ class PageGetAdmin(admin.ModelAdmin):
 admin.site.register(PageGet, PageGetAdmin)
 
 
-class ObjectImg(MPTTModel):
-    img = models.ImageField(upload_to='img',default='logo/2w.png')
-    parent = models.ForeignKey(PageGet)
-
-
-class ObjectImgAdmin(admin.ModelAdmin):
-    list_display = ('id','img','parent')
-
-admin.site.register(ObjectImg, ObjectImgAdmin)
-
-
 class Project(models.Model):
     id = models.AutoField(primary_key=True)
     pjt_name = models.CharField(max_length=50)
@@ -90,7 +79,7 @@ class ResponsePage(models.Model):
 
 
 class ResponsePageAdmin(admin.ModelAdmin):
-    list_display = ('pjt_id','pjt_name','add_time','mod_time','page_info','pjt_parent')
+    list_display = ('id','pjt_id','pjt_name','add_time','mod_time','page_info','pjt_parent')
 
 admin.site.register(ResponsePage, ResponsePageAdmin)
 
@@ -108,3 +97,14 @@ class ResponseRptAdmin(admin.ModelAdmin):
     list_display = ('pjt_id','pjt_name','add_time','mod_time','rpt_info','pjt_parent')
 
 admin.site.register(ResponseRpt, ResponseRptAdmin)
+
+
+class ObjectImg(MPTTModel):
+    img = models.ImageField(upload_to='img',default='logo/2w.png')
+    parent = models.ForeignKey(ResponsePage)
+
+
+class ObjectImgAdmin(admin.ModelAdmin):
+    list_display = ('id','img','parent')
+
+admin.site.register(ObjectImg, ObjectImgAdmin)

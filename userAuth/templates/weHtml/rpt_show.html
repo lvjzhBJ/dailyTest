@@ -14,8 +14,11 @@
         <div class="layui-col-md-offset0 fly-panel-main fly-filter">
             <ul style="width: 100%;min-height:350px;padding: 0;">
               <div class="layui-col-md6">
-    {#              {{ test_case_list }}#}
-                  ---
+                  {% if test_case_info.status %}
+                      <h2>{{ test_case_info.test_case_list }}</h2>
+                  {% else %}
+                      <h2>测试未执行，请等待</h2>
+                  {% endif %}
                   <div id="pio"></div>
               </div>
               <div class="layui-col-md6">

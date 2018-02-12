@@ -20,4 +20,5 @@ from . import views
 urlpatterns = [
     url(r'^p2c/$', views.pjt2client),
     url(r'^a2c/(\S+)/$', views.app2client),
+    url(r'^c2j/$', views.client2json),
 ]

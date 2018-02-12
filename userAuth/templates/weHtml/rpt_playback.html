@@ -23,19 +23,22 @@
                         <div class="layui-col-md2">
 {#                            <dl class="layui-nav-child">#}
                         <ul class="layui-tree"></ul>
-                            {% for i in test_case_list %}
-                                <li class="siteTag"><a onclick="
-                                document.getElementById('case_img').innerHTML= ''+
-                                '<img style=\'border:1px #FF00FF solid;\' height=\'300px\' src=\'' +
-                                     '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/'+
-                                        {% for j in i %}
-                                             {{ j.id }} +
-                                        {% endfor %}
-                                        '.gif\' alt=\'None_\' />'+
-                                '';" href="#"><cite>test_case_{{ forloop.counter }}</cite><em></em></a></li>
+                            {% if test_case_info.status  %}
+                                {% for i in test_case_info.test_case_list %}
+                                    <li class="siteTag"><a onclick="
+                                    document.getElementById('case_img').innerHTML= ''+
+                                    '<img style=\'border:1px #FF00FF solid;\' height=\'300px\' src=\'' +
+                                         '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/'+
+                                            {% for j in i %}
+                                                 {{ j.id }} +
+                                            {% endfor %}
+                                            '.gif\' alt=\'None_\' />'+
+                                    '';" href="#"><cite>test_case_{{ forloop.counter }}</cite><em></em></a></li>
 
-                            {% endfor %}
-{#                            </dl>#}
+                                {% endfor %}
+                            {% else %}
+                                <h2>测试未执行，请等待</h2>
+                            {% endif %}
                         </div>
                         <div class="layui-col-md6">
                             <ul class="layui-timeline">
