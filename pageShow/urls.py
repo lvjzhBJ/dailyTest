@@ -19,15 +19,15 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^del_pjt/(\S+)/$', views.del_pjt),
-    url(r'^(\S+)/(\S+)/report/show/$', views.rpt_show),
-    url(r'^(\S+)/(\S+)/report/sum/$', views.rpt_sum),
-    url(r'^(\S+)/(\S+)/report/playback/$', views.rpt_playback),
-    url(r'^(\S+)/(\S+)/show/$', views.pjt_show),
-    url(r'^(\S+)/(\S+)/edit/$', views.pjt_edit),
-    url(r'^(\S+)/(\S+)/case/$', views.pjt_case),
-    url(r'^(\S+)/show/$', views.user_show),
-    url(r'^(\S+)/add/$', views.user_add),
-    url(r'^(\S+)/new/$', views.user_new),
-    url(r'^(\S+)/del/$', views.user_del),
+    url(r'^del_pjt/(?P<pjt>.*)/$', views.del_pjt),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/show/$', views.rpt_show),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/sum/$', views.rpt_sum),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/playback/$', views.rpt_playback),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/show/$', views.pjt_show),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/edit/$', views.pjt_edit),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/case/$', views.pjt_case),
+    url(r'^(?P<un>.*)/show/$', views.user_show),
+    url(r'^(?P<un>.*)/add/$', views.user_add),
+    url(r'^(?P<un>.*)/new/$', views.user_new),
+    url(r'^(?P<un>.*)/del/$', views.user_del),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

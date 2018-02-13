@@ -27,18 +27,6 @@ def pjt2client(request):
             return rsp
 
 @csrf_exempt
-def app2client(request,pjt_id):
-    if request.method == 'GET':
-        pjt_on = Project.objects.filter(id=pjt_id)[:1]
-        the_file_name = pjt_on[0].app_file
-        response = FileResponse(the_file_name)
-        response['Content-Type'] = 'application/octet-stream'
-        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
-
-        return response
-
-
-@csrf_exempt
 def client2json(request):
     if request.method == 'POST':
 
