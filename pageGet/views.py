@@ -29,43 +29,58 @@ def pjt2client(request):
 @csrf_exempt
 def client2json(request):
     if request.method == 'POST':
-
         try:
             get_json = request.POST
             pjt_parent = Project.objects.filter(id=int(get_json.get('pjt_id')))
-
-            # print get_json.get('test_case_list')
             resPage,is_new_page = ResponsePage.objects.get_or_create(pjt_id = int(get_json.get('pjt_id')),
                                                                   pjt_name = get_json.get('pjt_name'),
                                                                   pjt_parent = pjt_parent[0],
                                                                   defaults = {'page_info': get_json.get('rpt_info')})
-
             resRpt,is_new_rpt = ResponseRpt.objects.get_or_create(pjt_id = int(get_json.get('pjt_id')),
                                                                   pjt_name = get_json.get('pjt_name'),
                                                                   pjt_parent = pjt_parent[0],
                                                                   defaults={'rpt_info': get_json.get('test_case_list')})
+            # img_path = os.path.join(os.path.dirname(__file__)) \
+            #            + '/media/img/user' \
+            #            + str(get_json.get('pjt_parent')) \
+            #            + '/pjt' \
+            #            + str(get_json.get('pjt_id'))\
+            #            +'/'
+            # keys = request.FILES.keys()
+            # print img_path
+            # for k in keys:
+            #     app_file = request.FILES[k]
+            #     if app_file:
+            #         if os.path.exists(img_path + k):
+            #             os.remove(img_path + k)
+            #         default_storage.save(img_path + k, ContentFile(app_file.read()))
+            return HttpResponse(resPage.id + '::' + resRpt.id, content_type='application/json')
+        except:
+            return HttpResponse(traceback.format_exc(), content_type='application/json')
 
+
+@csrf_exempt
+def client2img(request):
+    if request.method == 'POST':
+        try:
+            get_json = request.POST
             img_path = os.path.join(os.path.dirname(__file__)) \
                        + '/media/img/user' \
                        + str(get_json.get('pjt_parent')) \
                        + '/pjt' \
                        + str(get_json.get('pjt_id'))\
                        +'/'
-
             keys = request.FILES.keys()
-
             print img_path
             for k in keys:
                 app_file = request.FILES[k]
                 if app_file:
                     if os.path.exists(img_path + k):
                         os.remove(img_path + k)
-
                     default_storage.save(img_path + k, ContentFile(app_file.read()))
-
-            return HttpResponse(resPage.pjt_name + '::' + resRpt.pjt_name, content_type='application/json')
-
+            return HttpResponse(img_path+','.join(keys), content_type='application/json')
         except:
             print traceback.format_exc()
+            return HttpResponse(traceback.format_exc(), content_type='application/json')
 
 
