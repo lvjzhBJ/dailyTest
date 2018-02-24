@@ -14,59 +14,61 @@
 
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
                   <ul style="width: 100%;min-height:350px;padding: 0;">
-
                       <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                           <legend>项目:{{ pjt }}</legend>
                       </fieldset>
                       <div class="layui-collapse" lay-filter="test">
-                            {% for i in case_list_json %}
-                                    <div class="layui-colla-item">
-                                        <p hidden>{{ i.reverse }}</p>
-                                            <h2 class="layui-colla-title">
-                                            验证__
-                                                {% if i.0.text != 'no_value' %}
-                                                    [{{ i.0.text }}]
-                                                {% endif %}
-                                                {% if i.0.resource_id != 'no_value' %}
-                                                    [ {{ i.0.resource_id }} ]
-                                                {% endif %}
-                                            </h2>
+
+                          {% if test_case_info.status  %}
+                              {% for i in test_case_info.test_case_list %}
+                                        <div class="layui-colla-item">
                                             <p hidden>{{ i.reverse }}</p>
-                                        {% for j in i %}
+                                                <h2 class="layui-colla-title">
+                                                {{ forloop.counter }}验证__
+                                                    {% if i.0.text != 'no_value' %}
+                                                        [{{ i.0.text }}]
+                                                    {% endif %}
+                                                    {% if i.0.resource_id != 'no_value' %}
+                                                        [ {{ i.0.resource_id }} ]
+                                                    {% endif %}
+                                                </h2>
+                                                <p hidden>{{ i.reverse }}</p>
+                                            {% for j in i %}
 
-                                            <div class="layui-colla-content">
-                                            <p>
-                                                {% if j.is_run_error == 0 %}
+                                                <div class="layui-colla-content">
+                                                <p>{{ forloop.counter }}
+                                                    {% if j.is_run_error == 0 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #0C0C0C;">&#xe63d;</i>
+                                                    {% elif j.is_run_error == 1 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
+                                                    {% elif j.is_run_error == 3 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #E6162D;">&#xe69c;</i>
+                                                    {% else %}
+                                                        {{ j.is_run_error }}
+                                                    {% endif %}
 
-                                                {% elif j.is_run_error == 1 %}
-                                                    <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
-                                                {% elif j.is_run_error == 3 %}
-                                                    <i class="layui-icon" style="font-size: 15px; color: #E6162D;">&#xe69c;</i>
-                                                {% endif %}
+                                                    {% if '[ROOT]' in j.text %}
+                                                        显示根页面__{{ j.text }}
+                                                    {% elif '[PAGE]' in j.text %}
+                                                        显示页面__{{ j.text }}
+                                                    {% else %}
+                                                        点击
+                                                            {% if j.text != 'no_value' %}
+                                                                [{{ j.text }}]
+                                                            {% endif %}
+                                                            {% if j.resource_id != 'no_value' %}
+                                                                [ {{ j.resource_id }} ]
+                                                            {% endif %}
+                                                    {% endif %}
 
-                                                {% if '[ROOT]' in j.text %}
-                                                    显示根页面__{{ j.text }}
-                                                {% elif '[PAGE]' in j.text %}
-                                                    显示页面__{{ j.text }}
-                                                {% else %}
-                                                    点击
-                                                        {% if j.text != 'no_value' %}
-                                                            [{{ j.text }}]
-                                                        {% endif %}
-                                                        {% if j.resource_id != 'no_value' %}
-                                                            [ {{ j.resource_id }} ]
-                                                        {% endif %}
-                                                {% endif %}
-
-                                            </p>
-                                            </div>
-                                        {% endfor %}
-                            {% endfor %}
-                            </div>
+                                                </p>
+                                                </div>
+                                            {% endfor %}
+                              {% endfor %}
+                          {% endif %}
                         </div>
-
                   </ul>
-              </div>
+          </div>
       </div>
 {% endblock %}
 
