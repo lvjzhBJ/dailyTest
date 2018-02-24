@@ -11,12 +11,63 @@
               <span class="fly-mid"></span>
               <a href="/{{ username }}/{{ pjt }}/edit">编辑用例</a>
         </div>
+
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
-                  <ul style="width: 100%;min-height:350px;padding: 0;"></ul>
-                    待完善...
+                  <ul style="width: 100%;min-height:350px;padding: 0;">
+
+                      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                          <legend>项目:{{ pjt }}</legend>
+                      </fieldset>
+                      <div class="layui-collapse" lay-filter="test">
+                            {% for i in case_list_json %}
+                                    <div class="layui-colla-item">
+                                        <p hidden>{{ i.reverse }}</p>
+                                            <h2 class="layui-colla-title">
+                                            验证__
+                                                {% if i.0.text != 'no_value' %}
+                                                    [{{ i.0.text }}]
+                                                {% endif %}
+                                                {% if i.0.resource_id != 'no_value' %}
+                                                    [ {{ i.0.resource_id }} ]
+                                                {% endif %}
+                                            </h2>
+                                            <p hidden>{{ i.reverse }}</p>
+                                        {% for j in i %}
+
+                                            <div class="layui-colla-content">
+                                            <p>
+                                                {% if j.is_run_error == 0 %}
+
+                                                {% elif j.is_run_error == 1 %}
+                                                    <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
+                                                {% elif j.is_run_error == 3 %}
+                                                    <i class="layui-icon" style="font-size: 15px; color: #E6162D;">&#xe69c;</i>
+                                                {% endif %}
+
+                                                {% if '[ROOT]' in j.text %}
+                                                    显示根页面__{{ j.text }}
+                                                {% elif '[PAGE]' in j.text %}
+                                                    显示页面__{{ j.text }}
+                                                {% else %}
+                                                    点击
+                                                        {% if j.text != 'no_value' %}
+                                                            [{{ j.text }}]
+                                                        {% endif %}
+                                                        {% if j.resource_id != 'no_value' %}
+                                                            [ {{ j.resource_id }} ]
+                                                        {% endif %}
+                                                {% endif %}
+
+                                            </p>
+                                            </div>
+                                        {% endfor %}
+                            {% endfor %}
+                            </div>
+                        </div>
+
+                  </ul>
               </div>
       </div>
-
 {% endblock %}
 
 

@@ -343,6 +343,7 @@ def del_pjt(request,pjt):
 project
 '''
 
+
 def get_pages(pjt_id):
     page_tree = ResponsePage.objects.filter(pjt_id=pjt_id)
 
@@ -453,8 +454,33 @@ def pjt_case(request,un,pjt):
         userid = request.session.get('userid')
 
         page_info = get_pages(pjt_on[0].id)
-        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
-        request.session['page_info_json'] = page_info_json
+        print page_info
+        case_list=[]
+        case_info=[]
+
+        def get_case(child_info):
+            for i in child_info:
+                step={}
+                if isinstance(i,dict):
+                    if ':id/' in i['resource_id']:
+                        step['resource_id']=i['resource_id'][i['resource_id'].index(':id/')+4:]
+                    else:
+                        step['resource_id'] = i['resource_id']
+                    step['text']=i['text']
+                    step['is_run_error']=i['is_run_error']
+                    case_info.append(step)
+                    if len(i['children'])>0:
+                        get_case(i['children'])
+                    else:
+                        case_list.append(case_info)
+
+        get_case(page_info)
+        print case_list
+
+        case_list_json = json.dumps(case_list, cls=CJsonEncoder)
+        case_list_json = json.loads(case_list_json)
+
+        request.session['case_list_json'] = case_list_json
 
         return render_to_response('weHtml/user_pjt_case.html',
                                         {'project_info_json':project_info_json,
@@ -463,7 +489,7 @@ def pjt_case(request,un,pjt):
                                        'pjt':pjt,
                                        'pjt_id':pjt_on[0].id,
                                        'userid':userid,
-                                       'page_info':page_info_json})
+                                       'case_list_json':case_list_json})
 
 
 '''
