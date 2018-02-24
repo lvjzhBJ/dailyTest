@@ -472,6 +472,7 @@ def pjt_case(request,un,pjt):
                     if len(i['children'])>0:
                         get_case(i['children'])
                     else:
+                        case_info.pop()
                         case_list.append(case_info)
 
         get_case(page_info)
