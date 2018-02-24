@@ -2,13 +2,12 @@
 from __future__ import unicode_literals
 
 import os
-import json
 from django.core.files.base import ContentFile
 import traceback
 from pageGet.models import Project,ResponsePage,ResponseRpt
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse,FileResponse,HttpResponse
+from django.http import JsonResponse,HttpResponse
 # Create your views here.
 
 
@@ -71,6 +70,11 @@ def client2img(request):
                        + '/pjt' \
                        + str(get_json.get('pjt_id'))\
                        +'/'
+            img_save_path = './img/user' \
+                       + str(get_json.get('pjt_parent')) \
+                       + '/pjt' \
+                       + str(get_json.get('pjt_id'))\
+                       +'/'
             keys = request.FILES.keys()
             print img_path
             for k in keys:
@@ -78,8 +82,8 @@ def client2img(request):
                 if app_file:
                     if os.path.exists(img_path + k):
                         os.remove(img_path + k)
-                    default_storage.save(img_path + k, ContentFile(app_file.read()))
-            return HttpResponse('client2img|'+img_path+'|'+','.join(keys), content_type='application/json')
+                    default_storage.save(img_save_path + k, ContentFile(app_file.read()))
+            return HttpResponse('client2img|'+img_path+'|'+img_save_path+'|'+','.join(keys), content_type='application/json')
         except:
             print traceback.format_exc()
             return HttpResponse(traceback.format_exc(), content_type='application/json')
