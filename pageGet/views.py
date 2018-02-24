@@ -39,6 +39,12 @@ def client2json(request):
                                                                   pjt_name = get_json.get('pjt_name'),
                                                                   pjt_parent = pjt_parent[0],
                                                                   defaults={'rpt_info': get_json.get('test_case_list')})
+            if not is_new_page:
+                resPage.page_info=get_json.get('rpt_info')
+                resPage.save()
+            if not is_new_rpt:
+                resRpt.rpt_info = get_json.get('test_case_list')
+                resRpt.save()
             return HttpResponse('client2json|ResponsePage:'+str(resPage.id) + ' | ResponseRpt'+ str(resRpt.id), content_type='application/json')
         except:
             return HttpResponse(traceback.format_exc(), content_type='application/json')
