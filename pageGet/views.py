@@ -54,7 +54,7 @@ def client2json(request):
             #         if os.path.exists(img_path + k):
             #             os.remove(img_path + k)
             #         default_storage.save(img_path + k, ContentFile(app_file.read()))
-            return HttpResponse(resPage.id + '::' + resRpt.id, content_type='application/json')
+            return HttpResponse('client2json|ResponsePage:'+str(resPage.id) + 'ResponseRpt'+ str(resRpt.id), content_type='application/json')
         except:
             return HttpResponse(traceback.format_exc(), content_type='application/json')
 
@@ -78,7 +78,7 @@ def client2img(request):
                     if os.path.exists(img_path + k):
                         os.remove(img_path + k)
                     default_storage.save(img_path + k, ContentFile(app_file.read()))
-            return HttpResponse(img_path+','.join(keys), content_type='application/json')
+            return HttpResponse('client2img|'+img_path+','.join(keys), content_type='application/json')
         except:
             print traceback.format_exc()
             return HttpResponse(traceback.format_exc(), content_type='application/json')
