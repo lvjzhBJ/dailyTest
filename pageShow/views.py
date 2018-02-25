@@ -453,47 +453,14 @@ def pjt_case(request,un,pjt):
         email = request.session.get('email')
         userid = request.session.get('userid')
 
-        # page_info = get_pages(pjt_on[0].id)
-        # print page_info
-        case_list=[]
-        case_info=[]
-
-        def get_case(child_info,case_list):
-            for i in child_info:
-                step={}
-                if isinstance(i,dict):
-                    if ':id/' in i['resource_id']:
-                        step['resource_id']=i['resource_id'][i['resource_id'].index(':id/')+4:]
-                    else:
-                        step['resource_id'] = i['resource_id']
-                    step['text']=i['text']
-                    step['is_run_error']=i['is_run_error']
-                    case_info.append(step)
-                    if len(i['children'])>0:
-                        get_case(i['children'],case_list)
-                    else:
-                        case_list.append(case_info)
-                        for t in case_list:
-                            print t[-1]
-                        case_info.pop()
-
-        # get_case(page_info,case_list)
-        # for i in case_list:
-        #     print
-        #     for j in i:
-        #         print j['resource_id']
-        # case_list_json = json.dumps(page_info, cls=CJsonEncoder)
-        # case_list_json = json.loads(case_list_json)
-
         pjt_on = Project.objects.filter(pjt_name=pjt)
         rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
 
-        test_case_info = {}
-        test_case_info['status'] = 0
+        test_case_info = {'status':0}
         if rpt:
             test_case_info['status'] = 1
             test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
-
+        print test_case_info
         return render_to_response('weHtml/user_pjt_case.html',
                                         {'project_info_json':project_info_json,
                                        'email':email,
@@ -506,7 +473,6 @@ def pjt_case(request,un,pjt):
 report
 '''
 
-
 @csrf_exempt
 def rpt_show(request,un,pjt):
     username = request.session.get('username')
@@ -516,15 +482,17 @@ def rpt_show(request,un,pjt):
     userid = request.session.get('userid')
 
     pjt_on = Project.objects.filter(pjt_name=pjt)
-    # rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
+    rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
+    rpt_list = pickle.loads(rpt[0].rpt_info)
+    ct = []
+    for i in rpt_list:
+        ct.append(i[-1]['is_run_error'])
+    pass_int = ct.count(1)
+    fail_int = ct.count(-1)
+    na_int = ct.count(0)
+    block_int = ct.count(3)
 
-    # test_case_info = {}
-    # test_case_info['status'] = 0
-    # if rpt:
-    #     test_case_info['status'] = 1
-    #     test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
-
-    test_case_data = [[90, "#2dc6c8", "Pass"], [5, "#d7797f", "Fail"], [0, "#5ab1ee", "Block"], [5, "#b6a2dd", "NA"]]
+    test_case_data = [[pass_int, "#2dc6c8", "Pass"], [fail_int, "#d7797f", "Fail"], [block_int, "#5ab1ee", "Block"], [na_int, "#b6a2dd", "NA"]]
 
     rsp = render(request, 'weHtml/rpt_show.html', {'username': username,
                                                    'email': email,
