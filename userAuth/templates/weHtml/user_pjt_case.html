@@ -21,24 +21,24 @@
 
                           {% if test_case_info.status  %}
                               {% for i in test_case_info.test_case_list %}
-                                        <div class="layui-colla-item">
-                                            <p hidden>{{ i.reverse }}</p>
+                                    <div class="layui-colla-item">
                                                 <h2 class="layui-colla-title">
-                                                {{ forloop.counter }}验证__
-                                                    {% if i.0.text != 'no_value' %}
-                                                        [{{ i.0.text }}]
+                                                {% with i|last as t %}
+                                                TestCase.{{ forloop.counter }}&nbsp&nbsp验证_
+                                                    {% if t.text != 'no_value' %}
+                                                        [<i style="color: #286090;">{{ t.text }}</i>]
                                                     {% endif %}
-                                                    {% if i.0.resource_id != 'no_value' %}
-                                                        [ {{ i.0.resource_id }} ]
+                                                    {% if t.resource_id != 'no_value' %}
+                                                        [<i style="color: #5b80b2;">{{ t.resource_id }}</i>]
                                                     {% endif %}
+                                                {% endwith %}
                                                 </h2>
-                                                <p hidden>{{ i.reverse }}</p>
                                             {% for j in i %}
 
                                                 <div class="layui-colla-content">
-                                                <p>{{ forloop.counter }}
+                                                <p>
                                                     {% if j.is_run_error == 0 %}
-                                                        <i class="layui-icon" style="font-size: 15px; color: #0C0C0C;">&#xe63d;</i>
+                                                        <i class="layui-icon" style="font-size: 15px; color: #1E9FFF;">&#xe63d;</i>
                                                     {% elif j.is_run_error == 1 %}
                                                         <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
                                                     {% elif j.is_run_error == 3 %}
@@ -46,18 +46,20 @@
                                                     {% else %}
                                                         {{ j.is_run_error }}
                                                     {% endif %}
-
+                                                <i style="color: seagreen;">&nbsp&nbspstep&nbsp{{ forloop.counter }}&nbsp&nbsp</i>
                                                     {% if '[ROOT]' in j.text %}
-                                                        显示根页面__{{ j.text }}
+                                                        显示根页面__
+                                                        [<i style="color: #286090;">{{ j.text }}</i>]
                                                     {% elif '[PAGE]' in j.text %}
-                                                        显示页面__{{ j.text }}
+                                                        显示页面__
+                                                        [<i style="color: #286090;">{{ j.text }}</i>]
                                                     {% else %}
                                                         点击
                                                             {% if j.text != 'no_value' %}
-                                                                [{{ j.text }}]
+                                                                [<i style="color: #286090;">{{ j.text }}</i>]
                                                             {% endif %}
                                                             {% if j.resource_id != 'no_value' %}
-                                                                [ {{ j.resource_id }} ]
+                                                                [<i style="color: #5b80b2;">{{ j.resource_id }}</i>]
                                                             {% endif %}
                                                     {% endif %}
 
