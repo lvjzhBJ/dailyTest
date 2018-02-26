@@ -480,13 +480,21 @@ def rpt_show(request,un,pjt):
     project_info_json = request.session.get('project_info_json')
     email = request.session.get('email')
     userid = request.session.get('userid')
-
+    ct=[]
     pjt_on = Project.objects.filter(pjt_name=pjt)
     rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
-    rpt_list = pickle.loads(rpt[0].rpt_info)
-    ct = []
-    for i in rpt_list:
-        ct.append(i[-1]['is_run_error'])
+
+    test_case_info={}
+    test_case_info['status']=0
+    if rpt:
+        test_case_info['status']=1
+        test_case_info['test_case_list']=pickle.loads (rpt[0].rpt_info)
+    if rpt:
+        rpt_list = pickle.loads(rpt[0].rpt_info)
+
+        for i in rpt_list:
+            ct.append(i[-1]['is_run_error'])
+
     pass_int = ct.count(1)
     fail_int = ct.count(-1)
     na_int = ct.count(0)
@@ -500,6 +508,7 @@ def rpt_show(request,un,pjt):
                                                    'rpt':'报告',
                                                    'pjt_id':pjt_on[0].id,
                                                    'userid':userid,
+                                                   'test_case_info':test_case_info,
                                                    'test_case_data': json.dumps(test_case_data),
                                                    'project_info_json': project_info_json})
     return rsp

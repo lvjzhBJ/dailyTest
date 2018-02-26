@@ -14,12 +14,11 @@
 
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
                   <ul style="width: 100%;min-height:350px;padding: 0;">
+                    {% if test_case_info.status  %}
                       <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                           <legend>项目:{{ pjt }}</legend>
                       </fieldset>
                       <div class="layui-collapse" lay-filter="test">
-
-                          {% if test_case_info.status  %}
                               {% for i in test_case_info.test_case_list %}
                                     <div class="layui-colla-item">
                                                 <h2 class="layui-colla-title">
@@ -67,11 +66,12 @@
                                                 </div>
                                             {% endfor %}
                               {% endfor %}
-                          {% endif %}
                         </div>
+                      </div>
+                    {% else %}
+                        <a>测试未执行，请等待</a>
+                  {% endif %}
                   </ul>
           </div>
       </div>
 {% endblock %}
-
-
