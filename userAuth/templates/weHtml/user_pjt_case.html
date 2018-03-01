@@ -36,15 +36,6 @@
 
                                                 <div class="layui-colla-content">
                                                 <p>
-                                                    {% if j.is_run_error == 0 %}
-                                                        <i class="layui-icon" style="font-size: 15px; color: #1E9FFF;">&#xe63d;</i>
-                                                    {% elif j.is_run_error == 1 %}
-                                                        <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
-                                                    {% elif j.is_run_error == 3 %}
-                                                        <i class="layui-icon" style="font-size: 15px; color: #E6162D;">&#xe69c;</i>
-                                                    {% else %}
-                                                        {{ j.is_run_error }}
-                                                    {% endif %}
                                                 <i style="color: seagreen;">&nbsp&nbspstep&nbsp{{ forloop.counter }}&nbsp&nbsp</i>
                                                     {% if '[ROOT]' in j.text %}
                                                         显示根页面__

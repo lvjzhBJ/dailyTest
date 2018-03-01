@@ -527,9 +527,11 @@ def rpt_sum(request,un,pjt):
 
     test_case_info={}
     test_case_info['status'] = 0
+    rpt = pickle.loads(rpt[0].rpt_info)
     if rpt:
         test_case_info['status'] = 1
-        test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
+        test_case_info['test_case_list'] = rpt
+
 
     rsp = render(request, 'weHtml/rpt_sum.html', {'username': username,
                                               'email': email,
@@ -537,6 +539,7 @@ def rpt_sum(request,un,pjt):
                                               'rpt':'报告',
                                               'pjt_id':pjt_on[0].id,
                                               'userid':userid,
+                                                'rpt_json':json.dumps(rpt),
                                               'test_case_info': test_case_info,
                                               'project_info_json': project_info_json})
     return rsp

@@ -1,5 +1,4 @@
 {% extends 'base_logon.html' %}
-
    {% block body-logon %}
 
    <div class="fly-panel" style="margin-bottom: 0;">
@@ -13,46 +12,115 @@
 
         <div class="layui-col-md-offset0 fly-panel-main fly-filter">
             <ul style="width: 100%;min-height:350px;padding: 0;">
-                <div class="layui-collapse">
-          <div class="layui-colla-item">
-            <h2 class="layui-colla-title">项目:{{ pjt }}</h2>
-            <div class="layui-colla-content layui-show">
-                <div class="layui-container">
-                    <div class="layui-row">
-                        <div class="layui-col-md2">
-                        <ul class="layui-tree"></ul>
-                            {% if test_case_info.status  %}
-                                {% for i in test_case_info.test_case_list %}
-                                    <li class="siteTag"><a onclick="
-                                    document.getElementById('case_li').innerHTML= ''+
-                                     {% for j in i %}
-                                         '<li class=\'layui-timeline-item\'>' +
-                                         '<i class=\'layui-icon layui-timeline-axis\'>&#xe63f;</i>'+
-                                            '<div class=\'layui-timeline-content layui-text\'>'+
-                                              '<h3 class=\'layui-timeline-title\'>' +
-                                         'test_step_{{ forloop.counter }}</h3><p>{{ j.resource_id }}'+
-                                                '<img style=\'border:1px #FF00FF solid;\' height=\'100px\' src=\'' +
-                                         '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/bo_{{ j.id }}.jpg\' alt=\'None_\' />'+
-                                              '</p></div></li>'+
-                                    {% endfor %}
-                                    '';" href="#"><cite>test_case_{{ forloop.counter }}</cite><em></em></a></li>
 
-                                {% endfor %}
-                            {% else %}
-                                <h2>测试未执行，请等待</h2>
-                            {% endif %}
+                {% if test_case_info.status  %}
+                      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                          <legend>项目:{{ pjt }}</legend>
+                      </fieldset>
+                      <div class="layui-collapse" lay-filter="test">
+                              {% for i in test_case_info.test_case_list %}
+                                    <div class="layui-colla-item">
+                                                <h2 class="layui-colla-title">
+                                                {% with i|last as t %}
+                                                TestCase.{{ forloop.counter }}&nbsp&nbsp验证_
+                                                    {% if t.text != 'no_value' %}
+                                                        [<i style="color: #286090;">{{ t.text }}</i>]
+                                                    {% endif %}
+                                                    {% if t.resource_id != 'no_value' %}
+                                                        [<i style="color: #5b80b2;">{{ t.resource_id }}</i>]
+                                                    {% endif %}
+                                                {% endwith %}
+                                                </h2>
+
+                                            <div class="layui-colla-content">
+                                                <p>
+                                                    <h onclick="vt('{{ forloop.counter }}');">测试用例执行流</h>
+                                                </p>
+                                            </div>
+
+                                            {% for j in i %}
+                                                <div class="layui-colla-content">
+                                                <p>
+                                                    {% if j.is_run_error == 0 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #1E9FFF;">&#xe63d;</i>
+                                                    {% elif j.is_run_error == 1 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
+                                                    {% elif j.is_run_error == 3 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #E6162D;">&#xe69c;</i>
+                                                    {% else %}
+                                                        {{ j.is_run_error }}
+                                                    {% endif %}
+
+                                                <i style="color: seagreen;">&nbsp&nbspstep&nbsp{{ forloop.counter }}&nbsp&nbsp</i>
+                                                    {% if '[ROOT]' in j.text %}
+                                                        显示根页面__
+                                                        [<i style="color: #286090;">{{ j.text }}</i>]
+                                                    {% elif '[PAGE]' in j.text %}
+                                                        显示页面__
+                                                        [<i style="color: #286090;">{{ j.text }}</i>]
+                                                    {% else %}
+                                                        点击
+                                                            {% if j.text != 'no_value' %}
+                                                                [<i style="color: #286090;">{{ j.text }}</i>]
+                                                            {% endif %}
+                                                            {% if j.resource_id != 'no_value' %}
+                                                                [<i style="color: #5b80b2;">{{ j.resource_id }}</i>]
+                                                            {% endif %}
+                                                    {% endif %}
+                                                </p>
+                                                </div>
+                                            {% endfor %}
+                              {% endfor %}
                         </div>
-                        <div class="layui-col-md6">
-                            <ul class="layui-timeline">
-                                <ul id="case_li"></ul>
-                            </ul>
-                        </div>
-                  </div>
-                </div>
-            </div>
-          </div>
-          </div>
+                      </div>
+                    {% else %}
+                        <a>测试未执行，请等待</a>
+                  {% endif %}
             </ul>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+    var rpt_list = {{ rpt_json|safe }}
+    function vt(str) {
+        var show_str = '';
+        for (i in rpt_list[str]){
+            show_str = show_str+
+            '<li class="layui-timeline-item">' +
+                '<i class="layui-icon layui-timeline-axis">&#xe63f;</i>' +
+                '<div class="layui-timeline-content layui-text">\n<h3 class="layui-timeline-title">' +
+                'step.'+(i);
+            if (rpt_list[str][i].text.indexOf("[PAGE]")>-1){
+                show_str = show_str+'显示'+rpt_list[str][i].text;
+            } else if(rpt_list[str][i].text.indexOf("[ROOT]")>-1) {
+                show_str = show_str+'显示'+rpt_list[str][i].text;
+            } else{
+                if(rpt_list[str][i].operation.indexOf("scrollable")>-1){show_str = show_str +'滑动 [';}
+                if(rpt_list[str][i].operation.indexOf("clickable")>-1){show_str = show_str +'点击 [';}
+                if (rpt_list[str][i].text.indexOf("no_value")<0){show_str = show_str + rpt_list[str][i].text;}
+                if (rpt_list[str][i].resource_id.indexOf("no_value")<0){show_str = show_str + rpt_list[str][i].resource_id;}
+            }
+
+            show_str = show_str+ ']</h3><p>\n'
+                + rpt_list[str][i].is_run_error
+                {#+rpt_list[str][i].text#}
+                {#+rpt_list[str][i].resource_id#}
+                +'<img style="border:1px #FF00FF solid;" height="100px" src="/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/bo_'+rpt_list[str][i].id+'.jpg" alt="None" />'
+                +'\n</p>\n</div>\n</li>';
+        }
+        layer.open({
+              type: 1,
+              title: false,
+              closeBtn: 0,
+              shadeClose: true,
+              skin: 'yourclass',
+                content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' +
+                show_str +
+                '</div>'
+            });
+    };
+    </script>
+
 {% endblock %}

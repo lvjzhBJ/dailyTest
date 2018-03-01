@@ -34,7 +34,6 @@
   </li>
 
     </ul>
-
     <ul class="layui-nav fly-nav-user">
         {% if username %}
            <li class="layui-nav-item">
@@ -85,15 +84,15 @@
     <a href="/" target="_blank">获取Fly社区模版</a>
     <a href="/" target="_blank">微信公众号</a>
   </p>
+
 </div>
 
 <script src="{% static 'layui.js' %}" charset="utf-8"></script>
 <script>
 
-    layui.use(['element'], function(){
+    layui.use(['element','layer'], function(){
         var element = layui.element();
     });
-
 </script>
 {% block js %}{% endblock %}
 </body>
