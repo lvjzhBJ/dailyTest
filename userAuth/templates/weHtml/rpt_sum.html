@@ -34,7 +34,9 @@
 
                                             <div class="layui-colla-content">
                                                 <p>
-                                                    <h onclick="vt('{{ forloop.counter }}');">测试用例执行流</h>
+                                                    <h onclick="show_flow('{{ forloop.counter }}');">用例执行流</h>
+
+                                                    <h onclick="show_dyn('{{ forloop.counter }}');">动态操作</h>
                                                 </p>
                                             </div>
 
@@ -84,30 +86,30 @@
 {% block js %}
     <script>
     var rpt_list = {{ rpt_json|safe }}
-    function vt(str) {
-        var show_str = '';
-        for (i in rpt_list[str]){
-            show_str = show_str+
+    function show_flow(ft) {
+        var show_ft = '';
+        for (i in rpt_list[ft]){
+            show_ft = show_ft+
             '<li class="layui-timeline-item">' +
                 '<i class="layui-icon layui-timeline-axis">&#xe63f;</i>' +
-                '<div class="layui-timeline-content layui-text">\n<h3 class="layui-timeline-title">' +
-                'step.'+(i);
-            if (rpt_list[str][i].text.indexOf("[PAGE]")>-1){
-                show_str = show_str+'显示'+rpt_list[str][i].text;
-            } else if(rpt_list[str][i].text.indexOf("[ROOT]")>-1) {
-                show_str = show_str+'显示'+rpt_list[str][i].text;
+                '<div class="layui-timeline-content layui-text">\n<h3 class="layui-timeline-title" style="color: #BDB76B;">' +
+                'step.'+(i)+'<a style="color: #222222;">';
+            if (rpt_list[ft][i].text.indexOf("[PAGE]")>-1){
+                show_ft = show_ft+'<br />显示'+rpt_list[ft][i].text;
+            } else if(rpt_list[ft][i].text.indexOf("[ROOT]")>-1) {
+                show_ft = show_ft+'<br />显示'+rpt_list[ft][i].text;
             } else{
-                if(rpt_list[str][i].operation.indexOf("scrollable")>-1){show_str = show_str +'滑动 [';}
-                if(rpt_list[str][i].operation.indexOf("clickable")>-1){show_str = show_str +'点击 [';}
-                if (rpt_list[str][i].text.indexOf("no_value")<0){show_str = show_str + rpt_list[str][i].text;}
-                if (rpt_list[str][i].resource_id.indexOf("no_value")<0){show_str = show_str + rpt_list[str][i].resource_id;}
+                if(rpt_list[ft][i].operation.indexOf("scrollable")>-1){show_ft = show_ft +'<br />滑动 [';}
+                if(rpt_list[ft][i].operation.indexOf("clickable")>-1){show_ft = show_ft +'<br />点击 [';}
+                if (rpt_list[ft][i].text.indexOf("no_value")<0){show_ft = show_ft + rpt_list[ft][i].text;}
+                if (rpt_list[ft][i].resource_id.indexOf("no_value")<0){show_ft = show_ft + rpt_list[ft][i].resource_id;}
             }
 
-            show_str = show_str+ ']</h3><p>\n'
-                + rpt_list[str][i].is_run_error
-                {#+rpt_list[str][i].text#}
-                {#+rpt_list[str][i].resource_id#}
-                +'<img style="border:1px #FF00FF solid;" height="100px" src="/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/bo_'+rpt_list[str][i].id+'.jpg" alt="None" />'
+            show_ft = show_ft+ ']</a></h3><p>\n'
+                + rpt_list[ft][i].is_run_error
+                {#+rpt_list[ft][i].text#}
+                {#+rpt_list[ft][i].resource_id#}
+                +'<img style="border:1px #FF00FF solid;" height="100px" src="/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/bo_'+rpt_list[ft][i].id+'.jpg" alt="None" />'
                 +'\n</p>\n</div>\n</li>';
         }
         layer.open({
@@ -116,11 +118,29 @@
               closeBtn: 0,
               shadeClose: true,
               skin: 'yourclass',
-                content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">' +
-                show_str +
+                content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #FF00FF; font-weight: 300;">' +
+                show_ft +
                 '</div>'
             });
     };
+    function show_dyn(dt){
+        var show_ft = '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/';
+        for (i in rpt_list[dt]){
+            show_ft = show_ft+ rpt_list[dt][i].id;
+        }
+        show_ft = show_ft+'.gif';
+        {#alert(show_ft);#}
+        layer.open({
+              type: 1,
+              title: false,
+              closeBtn: 0,
+              shadeClose: true,
+              skin: 'yourclass',
+                content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #FF00FF; font-weight: 300;">' +
+                '<img style="border:1px #FF00FF solid;" height="300px" src='+show_ft+' alt="None_" />' +
+                '</div>'
+        });
+    }
     </script>
 
 {% endblock %}
