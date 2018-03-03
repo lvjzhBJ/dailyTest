@@ -33,7 +33,8 @@
                                 <b style="margin-right:20px" id='per'>0%</b>
                              <br><br>
                                 <div class="layui-col-md-offset2">
-                                    <input type="submit" onclick="upload();" value="搜索">
+{#                                    <input type="submit" onclick="upload();" value="搜索">#}
+                                    <button type="button" onclick="upload();">上传</button>
                           </div>
                          </div>
                      </div>
@@ -59,16 +60,25 @@
 			}
 		}
 		function upload() {
-			var xhr = new XMLHttpRequest();
-			var apk_file = document.getElementById('id_apk_file').files[0];
-            var form = new FormData();
-            form.append('apk_file',apk_file);
-            xhr.upload.addEventListener('progress',on_progress,false);
-            xhr.open('POST','{{ request.path }}',true);
-            xhr.setRequestHeader('X-CSRFTOKEN','{{ request.COOKIES.csrftoken }}');
-            xhr.send(form);
-            alert('21');
-		}
+            var xhr = new XMLHttpRequest();
+            var apk_file = document.getElementById('id_apk_file').files[0];
+            var pjt_name = document.getElementById('id_pjt_name').value;
+            if (!pjt_name) {
+                document.getElementById('id_pjt_name').setCustomValidity("pht_input");
+            } else if (!apk_file) {
+                document.getElementById('id_pjt_name').setCustomValidity("");
+                document.getElementById('id_apk_file').setCustomValidity("apk_input");
+            } else {
+                document.getElementById('id_apk_file').setCustomValidity("");
+                var form = new FormData();
+                form.append('apk_file', apk_file);
+                form.append('pjt_name', pjt_name);
+                xhr.upload.addEventListener('progress', on_progress, false);
+                xhr.open('POST', '{{ request.path }}', true);
+                xhr.setRequestHeader('X-CSRFTOKEN', '{{ request.COOKIES.csrftoken }}');
+                xhr.send(form);
+            }
+        }
 	</script>
 
 {% endblock %}
