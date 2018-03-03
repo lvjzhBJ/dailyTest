@@ -54,9 +54,10 @@
                                     </span>
                                     {{ projectform.apk_file }}
                                 </span>
-                                 <ul id = "id_apk_file_on" ></ul>
                              </div>
                              <br><br>
+                             <ul id = "id_apk_file_on" ><a style="font-size: 15px; color: #009688;">鼠标悬停可查看包文件名</a></ul>
+                             <br>
                              <div id='pross' style="height:20px;width:220px;border:2px solid gray;float:left;margin-right:10px;">
                                  <div id='pross_per' style="height:100%;width:0px;background:gray;"></div>
                              </div>
@@ -111,12 +112,12 @@
 
             if (!pjt_name) {
                 document.getElementById('id_pjt_name').setCustomValidity("pht_input");
-                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 20px; color: #FF5722;">需要输入项目名称</a>';
+                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 15px; color: #FF5722;">需要输入项目名称</a>';
             } else if (!apk_file) {
                 document.getElementById('id_pjt_name').setCustomValidity("");
-                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 20px; color: #FF5722;">需要选择程序包文件</a>';
+                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 15px; color: #FF5722;">需要选择程序包文件</a>';
             } else {
-                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 20px; color: #009688;">'+apk_file.name+'</a>';
+                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 15px; color: #009688;">'+apk_file.name+'</a>';
                 var form = new FormData();
                 form.append('apk_file', apk_file);
                 form.append('pjt_name', pjt_name);
