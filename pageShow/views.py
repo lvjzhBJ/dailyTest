@@ -35,7 +35,8 @@ class ProjectForm(forms.Form):
                                ,widget=forms.TextInput(attrs={
                                         'type': 'text',
                                        'class':'layui-input',
-                                       'lay-verify':'required'}),)
+                                       'lay-verify':'required'}))
+
     apk_file = forms.FileField(label='安装包')
 
 
@@ -235,6 +236,7 @@ def add_pross(request,un):
 
     if request.method == 'POST':
 
+        print request.FILES
         projectform=ProjectForm(request.POST,request.FILES)
 
         if projectform.is_valid():

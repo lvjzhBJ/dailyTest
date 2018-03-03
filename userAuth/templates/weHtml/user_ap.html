@@ -1,12 +1,34 @@
 {% extends 'base_logon.html' %}
 
+
+ {% block head-css %}
+
+    <style>
+        .fileinput-button {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+        .fileinput-button input{
+            position:absolute;
+            right: 0px;
+            top: 0px;
+            opacity: 0;
+            -ms-filter: 'alpha(opacity=0)';
+            font-size: 200px;
+        }
+    </style>
+
+ {% endblock %}
+
+
    {% block body-logon %}
 
     <div class="fly-panel" style="margin-bottom: 0;">
           <div class="fly-panel-title fly-filter">
               <a href="/{{ username }}/show">项目信息</a>
               <span class="fly-mid"></span>
-              <a href="/{{ username }}/ap">新建项目</a>
+              <a href="#" class="layui-this">新建项目</a>
               <span class="fly-mid"></span>
               <a href="/{{ username }}/del">删除项目</a>
         </div>
@@ -25,16 +47,23 @@
                              <div class="layui-input-inline">{{ projectform.pjt_name }}</div>
                              <br><br>
                              <label class="layui-form-label">{{ projectform.apk_file.label}}</label>
-                             <div class="layui-input-inline">{{ projectform.apk_file }}</div>
+                             <div class="layui-input-inline">
+                                 <span class="btn btn-success fileinput-button">
+                                    <span>
+                                        <a class="layui-btn layui-btn-danger"><i class="layui-icon"></i>选择文件</a>
+                                    </span>
+                                    {{ projectform.apk_file }}
+                                </span>
+                                 <ul id = "id_apk_file_on" ></ul>
+                             </div>
                              <br><br>
-                             <div id='pross' style="height:20px;width:100px;border:2px solid gray;float:left;margin-right:10px;">
+                             <div id='pross' style="height:20px;width:220px;border:2px solid gray;float:left;margin-right:10px;">
                                  <div id='pross_per' style="height:100%;width:0px;background:gray;"></div>
                              </div>
                                 <b style="margin-right:20px" id='per'>0%</b>
-                             <br><br>
+                             <br><br><br>
                                 <div class="layui-col-md-offset2">
-{#                                    <input type="submit" onclick="upload();" value="搜索">#}
-                                    <button type="button" onclick="upload();">上传</button>
+                                    <button type="button" class="layui-btn layui-btn-normal" onclick="upload();">创建项目</button>
                           </div>
                          </div>
                      </div>
@@ -51,25 +80,43 @@
 {% block js %}
 
 	<script>
+
+        function sleep(numberMillis) {
+            var now = new Date();
+            var exitTime = now.getTime() + numberMillis;
+            while (true) {
+                now = new Date();
+                if (now.getTime() > exitTime)
+                    return;
+            }
+        }
+
 		function on_progress(evt) {
 			if(evt.lengthComputable) {
 				var ele = document.getElementById('pross_per');
 				var percent = Math.round((evt.loaded) * 100 / evt.total);
 				ele.style.width = percent + '%';
 				document.getElementById('per').innerHTML = percent + '%';
+				if (percent == 100){
+				    sleep(500);
+                    window.location.href="/{{ username }}/show"
+                }
 			}
 		}
 		function upload() {
+
             var xhr = new XMLHttpRequest();
             var apk_file = document.getElementById('id_apk_file').files[0];
             var pjt_name = document.getElementById('id_pjt_name').value;
+
             if (!pjt_name) {
                 document.getElementById('id_pjt_name').setCustomValidity("pht_input");
+                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 20px; color: #FF5722;">需要输入项目名称</a>';
             } else if (!apk_file) {
                 document.getElementById('id_pjt_name').setCustomValidity("");
-                document.getElementById('id_apk_file').setCustomValidity("apk_input");
+                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 20px; color: #FF5722;">需要选择程序包文件</a>';
             } else {
-                document.getElementById('id_apk_file').setCustomValidity("");
+                document.getElementById('id_apk_file_on').innerHTML='<a style="font-size: 20px; color: #009688;">'+apk_file.name+'</a>';
                 var form = new FormData();
                 form.append('apk_file', apk_file);
                 form.append('pjt_name', pjt_name);
