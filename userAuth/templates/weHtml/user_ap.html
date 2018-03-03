@@ -34,7 +34,6 @@
                              <br><br>
                                 <div class="layui-col-md-offset2">
                                     <input type="submit" onclick="upload();" value="搜索">
-{#                                    <button type="button" onclick="upload();">上传</button>#}
                           </div>
                          </div>
                      </div>
@@ -61,15 +60,14 @@
 		}
 		function upload() {
 			var xhr = new XMLHttpRequest();
-			{#var apk_file = document.getElementById('id_apk_file').files[0];#}
-            var pjt_name = document.getElementById('id_pjt_name').value;
+			var apk_file = document.getElementById('id_apk_file').files[0];
             var form = new FormData();
-            form.append('pjt_name',pjt_name);
-
+            form.append('apk_file',apk_file);
             xhr.upload.addEventListener('progress',on_progress,false);
             xhr.open('POST','{{ request.path }}',true);
             xhr.setRequestHeader('X-CSRFTOKEN','{{ request.COOKIES.csrftoken }}');
             xhr.send(form);
+            alert('21');
 		}
 	</script>
 
