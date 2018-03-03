@@ -26,9 +26,9 @@
                             <select name="stand_pjt_edit" lay-filter="aihao">
                                 {% for pjt in project_info_json %}
                                     <option value="{{ pjt.id }}"
-                                    {% if pjt.stand == 1%}
+                                    {% if pjt.stand == 1 %}
                                             selected=""
-                                    {% endif %}> {{ pjt.id }}--{{ pjt.pjt_name }}--{{ pjt.stand }} </option>
+                                    {% endif %}>{{ pjt.pjt_name }}</option>
                                 {% endfor %}
                             </select>
                         </div>

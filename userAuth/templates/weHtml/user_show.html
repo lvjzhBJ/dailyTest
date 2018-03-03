@@ -20,7 +20,7 @@
                                   <thead><tr><th>id</th><th>sta</th><th>plf</th><th>time</th><th>pjt_name</th><th>app_path</th></tr></thead>
                                   <tbody>
                                 {% for i in project_info_json %}
-                                    <tr><td>{{ i.id }}</td>
+                                    <tr {% if i.stand == 1 %} style="font-size: 15px; color: #1E9FFF;" {% endif %}><td>{{ i.id }}</td>
                                         <td>{{ i.crom_status }}</td>
                                         <td>{{ i.app_plate }}</td>
                                         <td>{{ i.create_time }}</td>
@@ -29,8 +29,8 @@
                                 {% endfor %}
                                   </tbody></table>
                             {% endif %}
-
-                          </ul>
+                            </ul>
+                            <i class="layui-icon" style="font-size: 20px; color: #1E9FFF;">&#xe756基准项目</i>
                       </div>
                 </div>
 {% endblock %}
