@@ -27,8 +27,7 @@ urlpatterns = [
     url(r'^(?P<un>.*)/(?P<pjt>.*)/edit/$', views.pjt_edit),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/case/$', views.pjt_case),
     url(r'^(?P<un>.*)/show/$', views.user_show),
-    url(r'^(?P<un>.*)/add/$', views.user_add),
-    url(r'^(?P<un>.*)/new/$', views.user_new),
-    url(r'^(?P<un>.*)/ap/$', views.add_pross),
+    url(r'^(?P<un>.*)/pjt2stand/$', views.pjt2stand),
+    url(r'^(?P<un>.*)/pross/$', views.user_pross),
     url(r'^(?P<un>.*)/del/$', views.user_del),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -18,16 +18,6 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-class ProjectNewForm(forms.Form):
-    pjt_name = forms.CharField(required=True,
-                               label='项目名称',
-                               max_length=20
-                               ,widget=forms.TextInput(attrs={
-                                        'type': 'text',
-                                       'class':'layui-input',
-                                       'lay-verify':'required'}))
-
-
 class ProjectForm(forms.Form):
     pjt_name = forms.CharField(required=True,
                                label='项目名称',
@@ -71,10 +61,8 @@ def get_page_info(pr_id):
 
     pjt = PageGet.objects.filter(parent=None,x_class=pr_id)
     tree_view = []
-    print pjt
     if pjt:
         for p_i in pjt:
-            print '----',p_i.id
             tree_view.append({"id": p_i.id,
                               "name": p_i.text,
                               "spread":True,
@@ -84,16 +72,14 @@ def get_page_info(pr_id):
                               "bounds":p_i.bounds,
                               "is_run_error": p_i.is_run_error,
                               "children": get_tree(p_i)})
-    print tree_view
     return tree_view
 
 
 @csrf_exempt
 def page_get(request):
-    print 'page_get'
     run_once = request.session.get('run_once', 0)
     pr_id = request.COOKIES.get('pr_id', None)
-    print '-----',pr_id
+
     t = int(time.time()*1000) - int(run_once)
 
     if t>100 or not run_once:
@@ -101,12 +87,10 @@ def page_get(request):
         return HttpResponse('请先选择项目')
 
     if pr_id and pr_id != "-1":
-        print 'run_once...'
         request.session['run_once'] = int(time.time())
         request.session['name'] = int(time.time())
 
         page_info = get_page_info(pr_id)
-        print page_info
         return render_to_response('page_get.html',{'page_info':json.dumps(page_info)})
     return HttpResponse('请先选择项目2')
 
@@ -119,8 +103,7 @@ user
 def db_insert_pjt(userid):
 
     user = User.objects.filter(id=userid)
-    project_info = list(Project.objects.filter(pjt_owner=user).values('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status'))
-    print project_info
+    project_info = list(Project.objects.filter(pjt_owner=user).values('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status','stand'))
     if project_info:
         pjt,is_new = ResponsePjt.objects.get_or_create(user_id=userid,
                                                        user_parent=user[0],
@@ -159,7 +142,7 @@ def user_show(request,un):
         project_info_json = json.dumps(project_info,cls=CJsonEncoder)
         project_info_json = json.loads(project_info_json)
         request.session['project_info_json'] = project_info_json
-
+        print project_info_json
         rsp = render(request, 'weHtml/user_show.html', {'username': username,
                                                         'email': email,
                                                         'ver_status':ver_status,
@@ -169,63 +152,44 @@ def user_show(request,un):
 
 
 @csrf_exempt
-def user_add(request,un):
+def pjt2stand(request,un):
     username = request.session.get('username')
-    ver_status=request.session.get ('ver_status')
+    ver_status = request.session.get('ver_status')
 
     if un != username:
         request.session['ver_status'] = 'FAIL_用登录失效...'
         return redirect('/login')
 
     if request.method == 'POST':
-        projectform = ProjectNewForm(request.POST, request.FILES)
 
-        if not projectform.is_valid():
-            request.session['ver_status'] = 'FAIL_请输入项目名称...'
-            return redirect('/' + username + '/show')
+        stand_id = request.POST.get('stand_pjt_edit')
+        print stand_id
 
-        pjt_name = projectform.cleaned_data['pjt_name']
-        app_file = request.FILES.get('file', None)
+        Project.objects.filter(stand=1).update(stand=0)
 
-        if not app_file:
-            request.session['ver_status'] = 'FAIL_请选择安装包文件...'
-            return redirect('/' + username + '/show')
+        Project.objects.filter(id=stand_id).update(stand=1)
 
-        pjt = Project()
-        pjt.pjt_name = pjt_name
-        pjt.app_file = app_file
         userid = request.session.get('userid')
-        user = User.objects.filter(username=username, id=userid)
-        if not user:
-            request.session['ver_status'] = 'FAIL_账户异常,请重新登录...'
-            return redirect('/' + username + '/show')
-        pjt.pjt_owner = user[0]
-        if str(app_file)[-4:] == '.apk':
-            pjt.app_plate = 'Android'
-        pjt.save()
-
         db_insert_pjt(userid)
 
-        request.session['ver_status'] = '项目' + pjt_name + '创建成功'
         return redirect('/' + username + '/show')
-    else:
-        projectform = ProjectNewForm()
 
+    else:
         email = request.session.get('email')
         project_info_json = request.session.get('project_info_json')
 
-        rsp = render(request, 'weHtml/user_add.html', {'username': username,
-                                                       'email': email,
-                                                        'ver_status':ver_status,
-                                                       'projectform': projectform,
-                                                       'project_info_json': project_info_json
-                                                        })
+        rsp = render(request, 'weHtml/user_stand.html', {'username': username,
+                                                         'email': email,
+                                                         'ver_status': ver_status,
+                                                         'project_info_json': project_info_json
+                                                         })
 
         request.session['ver_status'] = None
         return rsp
 
+
 @csrf_exempt
-def add_pross(request,un):
+def user_pross(request,un):
     username = request.session.get('username')
     ver_status = request.session.get('ver_status')
 
@@ -236,7 +200,6 @@ def add_pross(request,un):
 
     if request.method == 'POST':
 
-        print request.FILES
         projectform=ProjectForm(request.POST,request.FILES)
 
         if projectform.is_valid():
@@ -254,6 +217,9 @@ def add_pross(request,un):
             pjt.pjt_owner = user[0]
             if str(app_file)[-4:] == '.apk':
                 pjt.app_plate = 'Android'
+            pjt_stand = Project.objects.filter(pjt_owner=user[0], stand=1)
+            if not pjt_stand:
+                pjt.stand = 1
             pjt.save()
 
             db_insert_pjt(userid)
@@ -266,7 +232,7 @@ def add_pross(request,un):
         email = request.session.get('email')
         project_info_json = request.session.get('project_info_json')
 
-        rsp = render(request, 'weHtml/user_ap.html', {'username': username,
+        rsp = render(request, 'weHtml/user_pross.html', {'username': username,
                                                        'email': email,
                                                       'projectform':projectform,
                                                        'ver_status': ver_status,
@@ -274,63 +240,6 @@ def add_pross(request,un):
                                                        })
 
         request.session['ver_status'] = None
-        return rsp
-
-
-@csrf_exempt
-def user_new(request,un):
-    username=request.session.get ('username')
-    ver_status=request.session.get ('ver_status')
-
-    if un!=username:
-        request.session['ver_status']='FAIL_用登录失效...'
-        return redirect ('/login')
-
-    if request.method=='POST':
-        projectform=ProjectForm(request.POST,request.FILES)
-
-        if not projectform.is_valid ():
-            request.session['ver_status']='FAIL_请输入项目名称...'
-            return redirect ('/'+username+'/show')
-
-        pjt_name=projectform.cleaned_data['pjt_name']
-        # app_file=request.FILES.get ('file',None)
-
-        # if not app_file:
-        #     request.session['ver_status']='FAIL_请选择安装包文件...'
-        #     return redirect ('/'+username+'/show')
-
-        pjt=Project()
-        pjt.pjt_name=pjt_name
-        # pjt.app_file=app_file
-        userid=request.session.get ('userid')
-        user=User.objects.filter (username=username,id=userid)
-        if not user:
-            request.session['ver_status']='FAIL_账户异常,请重新登录...'
-            return redirect ('/'+username+'/show')
-        pjt.pjt_owner=user[0]
-        # if str (app_file)[-4:]=='.apk':
-        #     pjt.app_plate='Android'
-        pjt.save ()
-
-        db_insert_pjt(userid)
-
-        request.session['ver_status']='项目'+pjt_name+'创建成功'
-        return redirect ('/'+username+'/show')
-    else:
-        projectform=ProjectForm()
-
-        email=request.session.get ('email')
-        project_info_json=request.session.get('project_info_json')
-
-        rsp=render (request,'weHtml/user_new.html',{'username':         username,
-                                                    'email':            email,
-                                                    'ver_status':       ver_status,
-                                                    'projectform':      projectform,
-                                                    'project_info_json':project_info_json
-                                                    })
-
-        request.session['ver_status']=None
         return rsp
 
 
@@ -505,7 +414,6 @@ def pjt_case(request,un,pjt):
         if rpt:
             test_case_info['status'] = 1
             test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
-        print test_case_info
         return render_to_response('weHtml/user_pjt_case.html',
                                         {'project_info_json':project_info_json,
                                        'email':email,

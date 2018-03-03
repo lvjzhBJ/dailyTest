@@ -44,13 +44,14 @@ class Project(models.Model):
     pjt_owner = models.ForeignKey(User)
     create_time = models.DateTimeField(default=timezone.now)
     crom_status = models.IntegerField(default=0)
+    stand = models.IntegerField(default=0)
 
     def __unicode__(self):
         return  self.pjt_name
 
 
 class ProjectnewAdmin(admin.ModelAdmin):
-    list_display = ('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status')
+    list_display = ('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status','stand')
 
 admin.site.register(Project, ProjectnewAdmin)
 
