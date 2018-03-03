@@ -6,10 +6,10 @@
           <div class="fly-panel-title fly-filter">
               <a href="/{{ username }}/show">项目信息</a>
               <span class="fly-mid"></span>
-              <a href="#" class="layui-this">添加项目</a>
-              <span class="fly-mid"></span>
-{#              <a href="/{{ username }}/new">新建项目</a>#}
+{#              <a href="#" class="layui-this">添加项目</a>#}
 {#              <span class="fly-mid"></span>#}
+              <a href="/{{ username }}/ap">新建项目</a>
+              <span class="fly-mid"></span>
               <a href="/{{ username }}/del">删除项目</a>
         </div>
 
@@ -26,7 +26,6 @@
                          <div class="layui-upload">
                              <label class="layui-form-label">{{ projectform.pjt_name.label}}</label>
                                 <div class="layui-input-inline">{{ projectform.pjt_name }}</div>
-
                                     <br><br>
                                 <label class="layui-form-label">安装包文件</label>
                                   <button type="button" class="layui-btn layui-btn-danger" id="apk_up"><i class="layui-icon"></i>选择文件</button>

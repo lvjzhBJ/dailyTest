@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^(?P<un>.*)/show/$', views.user_show),
     url(r'^(?P<un>.*)/add/$', views.user_add),
     url(r'^(?P<un>.*)/new/$', views.user_new),
+    url(r'^(?P<un>.*)/ap/$', views.add_pross),
     url(r'^(?P<un>.*)/del/$', views.user_del),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

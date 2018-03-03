@@ -35,16 +35,8 @@ class ProjectForm(forms.Form):
                                ,widget=forms.TextInput(attrs={
                                         'type': 'text',
                                        'class':'layui-input',
-                                       'lay-verify':'required'}))
-
-    apk_path = forms.CharField (required=True,
-                                label='安装包'
-                                ,widget=forms.TextInput(attrs={
-                                        'id':       'oss_apk',
-                                        'readonly': 'readonly',
-                                        'type':      'text',
-                                        'class':     'layui-input',
-                                        'lay-verify':'required'}))
+                                       'lay-verify':'required'}),)
+    apk_file = forms.FileField(label='安装包')
 
 
 def get_tree(parent_pjt):
@@ -223,10 +215,61 @@ def user_add(request,un):
 
         rsp = render(request, 'weHtml/user_add.html', {'username': username,
                                                        'email': email,
-                                                       'ver_status':ver_status,
+                                                        'ver_status':ver_status,
                                                        'projectform': projectform,
                                                        'project_info_json': project_info_json
                                                         })
+
+        request.session['ver_status'] = None
+        return rsp
+
+@csrf_exempt
+def add_pross(request,un):
+    username = request.session.get('username')
+    ver_status = request.session.get('ver_status')
+
+
+    if un != username:
+        request.session['ver_status'] = 'FAIL_用登录失效...'
+        return redirect('/login')
+
+    if request.method == 'POST':
+
+        projectform=ProjectForm(request.POST,request.FILES)
+
+        if projectform.is_valid():
+            pjt_name = projectform.cleaned_data['pjt_name']
+            app_file = request.FILES.get('apk_file', None)
+
+            pjt = Project()
+            pjt.pjt_name = pjt_name
+            pjt.app_file = app_file
+            userid = request.session.get('userid')
+            user = User.objects.filter(username=username, id=userid)
+            if not user:
+                request.session['ver_status'] = 'FAIL_账户异常,请重新登录...'
+                return redirect('/' + username + '/show')
+            pjt.pjt_owner = user[0]
+            if str(app_file)[-4:] == '.apk':
+                pjt.app_plate = 'Android'
+            pjt.save()
+
+            db_insert_pjt(userid)
+
+            request.session['ver_status'] = '项目' + pjt_name + '创建成功'
+            return redirect('/' + username + '/show')
+
+    else:
+        projectform=ProjectForm()
+        email = request.session.get('email')
+        project_info_json = request.session.get('project_info_json')
+
+        rsp = render(request, 'weHtml/user_ap.html', {'username': username,
+                                                       'email': email,
+                                                      'projectform':projectform,
+                                                       'ver_status': ver_status,
+                                                       'project_info_json': project_info_json
+                                                       })
 
         request.session['ver_status'] = None
         return rsp
@@ -512,7 +555,6 @@ def rpt_show(request,un,pjt):
                                                    'test_case_data': json.dumps(test_case_data),
                                                    'project_info_json': project_info_json})
     return rsp
-
 
 @csrf_exempt
 def rpt_sum(request,un,pjt):

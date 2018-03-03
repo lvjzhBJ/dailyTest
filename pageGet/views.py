@@ -8,6 +8,7 @@ from pageGet.models import Project,ResponsePage,ResponseRpt
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse,HttpResponse
+from django.shortcuts import render
 # Create your views here.
 
 
@@ -77,5 +78,3 @@ def client2img(request):
             return HttpResponse('client2img|'+img_path+'|'+img_save_path+'|'+','.join(keys), content_type='application/json')
         except:
             return HttpResponse(traceback.format_exc(), content_type='application/json')
-
-

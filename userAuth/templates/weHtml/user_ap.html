@@ -1,0 +1,76 @@
+{% extends 'base_logon.html' %}
+
+   {% block body-logon %}
+
+    <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="/{{ username }}/show">项目信息</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/ap">新建项目</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/del">删除项目</a>
+        </div>
+
+        <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+            <div style="width: 100%;height:320px;padding: 0;">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                  <legend>请录入项目信息</legend>
+                </fieldset>
+                <div class="layui-col-md-offset3 fly-panel-main fly-filter">
+                    <form method = 'post' class="layui-form layui-form-pane" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="layui-col-md-offset0">
+                         <div class="layui-upload">
+                              <label class="layui-form-label">{{ projectform.pjt_name.label}}</label>
+                             <div class="layui-input-inline">{{ projectform.pjt_name }}</div>
+                             <br><br>
+                             <label class="layui-form-label">{{ projectform.apk_file.label}}</label>
+                             <div class="layui-input-inline">{{ projectform.apk_file }}</div>
+                             <br><br>
+                             <div id='pross' style="height:20px;width:100px;border:2px solid gray;float:left;margin-right:10px;">
+                                 <div id='pross_per' style="height:100%;width:0px;background:gray;"></div>
+                             </div>
+                                <b style="margin-right:20px" id='per'>0%</b>
+                             <br><br>
+                                <div class="layui-col-md-offset2">
+                                    <input type="submit" onclick="upload();" value="搜索">
+{#                                    <button type="button" onclick="upload();">上传</button>#}
+                          </div>
+                         </div>
+                     </div>
+                  </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+
+	<script>
+		function on_progress(evt) {
+			if(evt.lengthComputable) {
+				var ele = document.getElementById('pross_per');
+				var percent = Math.round((evt.loaded) * 100 / evt.total);
+				ele.style.width = percent + '%';
+				document.getElementById('per').innerHTML = percent + '%';
+			}
+		}
+		function upload() {
+			var xhr = new XMLHttpRequest();
+			{#var apk_file = document.getElementById('id_apk_file').files[0];#}
+            var pjt_name = document.getElementById('id_pjt_name').value;
+            var form = new FormData();
+            form.append('pjt_name',pjt_name);
+
+            xhr.upload.addEventListener('progress',on_progress,false);
+            xhr.open('POST','{{ request.path }}',true);
+            xhr.setRequestHeader('X-CSRFTOKEN','{{ request.COOKIES.csrftoken }}');
+            xhr.send(form);
+		}
+	</script>
+
+{% endblock %}
