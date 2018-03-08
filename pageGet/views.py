@@ -5,6 +5,7 @@ import os
 from django.core.files.base import ContentFile
 import traceback
 from pageGet.models import Project,ResponsePage,ResponseRpt
+from userAuth.models import User
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse,HttpResponse
@@ -76,5 +77,44 @@ def client2img(request):
                         os.remove(img_path + k)
                     default_storage.save(img_save_path + k, ContentFile(app_file.read()))
             return HttpResponse('client2img|'+img_path+'|'+img_save_path+'|'+','.join(keys), content_type='application/json')
+        except:
+            return HttpResponse(traceback.format_exc(), content_type='application/json')
+
+
+@csrf_exempt
+def clean_apk(request):
+    if request.method == 'POST':
+        try:
+            get_json = request.POST
+            img_path = os.path.join(os.path.dirname(__file__)) + '/media/appfile/'
+            pjt_id = get_json.get('pjt_id')
+            pjt_owner = get_json.get('pjt_owner')
+            app_file = get_json.get('app_file')
+
+            po=User.objects.filter(id=pjt_owner)
+            acc_pjt = Project.objects.filter(pjt_owner=po,id=pjt_id)
+            exit_app=[]
+            if acc_pjt:
+                all_pjt = Project.objects.all()
+
+                if all_pjt:
+                    for i in all_pjt:
+                        exit_app.append(i.app_file.name.replace('appfile/',''))
+
+            all_app = os.listdir(img_path)
+
+            for i in all_app:
+                if i in exit_app:
+                    print 'pjt apk is:',i
+                else:
+                    if os.path.exists(img_path+i):
+                        print 'del apk:', img_path + i
+                        # 删除文件，可使用以下两种方法。
+                        os.remove(img_path+i)
+                        # os.unlink(my_file)
+                    else:
+                        print 'no such file:%s' % img_path+i
+
+            return HttpResponse(acc_pjt, content_type='application/json')
         except:
             return HttpResponse(traceback.format_exc(), content_type='application/json')
