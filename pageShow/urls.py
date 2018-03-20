@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^(?P<un>.*)/(?P<pjt>.*)/show/$', views.pjt_show),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/edit/$', views.pjt_edit),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/case/$', views.pjt_case),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/fcs/$', views.pjt_func),
     url(r'^(?P<un>.*)/show/$', views.user_show),
     url(r'^(?P<un>.*)/pjt2stand/$', views.pjt2stand),
     url(r'^(?P<un>.*)/pross/$', views.user_pross),
