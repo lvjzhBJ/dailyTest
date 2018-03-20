@@ -30,13 +30,16 @@
           <div class="fly-panel-title fly-filter">
               <a href="/{{ username }}/{{ pjt }}/show">结构展示</a>
               <span class="fly-mid"></span>
-              <a href="/{{ username }}/{{ pjt }}/case">用例列表</a>
+              <a href="/{{ username }}/{{ pjt }}/case">流程用例</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/fcs">功能点用例</a>
               <span class="fly-mid"></span>
               <a href="#" class="layui-this">编辑用例</a>
             </div>
 
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
-              <div style="width: 100%;min-height:350px;padding: 0;">
+              <div  style="width: 100%;min-height:350px;padding: 0;">
+                    <ul id="iis">112</ul>
                     <ul id="cs"></ul>
                     <form class="layui-form" id="case_form" method="post">
                         <div class="layui-form-item layui-form-text">
@@ -49,8 +52,8 @@
                             </div>
                           </div>
                     </form>
-
                 </div>
+
               </div>
             </div>
 
@@ -61,7 +64,10 @@
     <script>
         var step_count = 1;
         var bo  = {{ page_info|safe }};
+        var userid = {{ userid|safe }};
+        var pjt_id = {{ pjt_id|safe }};
         var arr_bo = [];
+        var arr_img = [];
 
         function del_ul(del_count){
             for (;del_count<step_count;step_count--){
@@ -101,6 +107,8 @@
             for (var i=0;i<step_count-1;i++) {
                 bo=bo[arr_bo[i]-1].children;
             }
+            arr_img = arr_img.slice(0,step_count);
+            arr_bo = arr_bo.slice(0,step_count);
         }
 
         function obj_del_ul(del_count){
@@ -131,6 +139,7 @@
             step_count = step_count+1;
             bo=bo[index-1].children;
             arr_bo.push(index);
+            arr_img.push(bo[index-1].id);
         }
 
         function add_step(){
@@ -172,7 +181,6 @@
                 };
                 document.getElementById('cs').appendChild(myObj);
                 myObj.options.add(new Option("选择控件", ""));
-                alert(bo);
                 for (sn in bo) {
                     myObj.options.add(new Option(bo[sn].name, bo[sn].id));
                 }
@@ -194,6 +202,12 @@
                 my_div.id = "div_" + step_count;
                 my_div.innerHTML = "<br>";
                 document.getElementById('cs').appendChild(my_div);
+                iis=document.getElementById('iis');
+                iis.innerHTML='';
+                for (i in arr_img){
+                    i_path="/pageGet/media/img/user"+userid+"/pjt"+pjt_id+"/bo_"+arr_img[i]+".jpg";
+                    iis.innerHTML = iis.innerHTML + '<img style="border:1px #FF00FF solid;" height="100px" src="'+i_path+'" alt="None" />';
+                }
             }
         }
 
