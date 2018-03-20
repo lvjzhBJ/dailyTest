@@ -96,9 +96,22 @@
             }
         }
 
+        function reset_bo() {
+            bo  = {{ page_info|safe }};
+
+            for (var i=0;i<step_count-1;i++)
+            {
+                alert(i);
+                alert(arr_bo[i]);
+                bo=bo[arr_bo[i]-1].children;
+                alert(3);
+            }
+        }
+
         function obj_del_ul(del_count){
             if (step_count>del_count){
                 del_ul(del_count);
+                reset_bo();
             }
         }
 
@@ -108,6 +121,7 @@
             if (obj){
                 del_ul(del_count);
                 step_count = step_count+1;
+                reset_bo();
             }
         }
 
@@ -186,7 +200,6 @@
             my_div.id="div_"+step_count;
             my_div.innerHTML="<br>";
             document.getElementById('cs').appendChild(my_div);
-
         }
 
         add_step();
