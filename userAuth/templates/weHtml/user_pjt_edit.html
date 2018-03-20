@@ -154,47 +154,47 @@
                 ul_pt=document.getElementById('pt');
                 ul_pt.appendChild(ul_of);
             }
+            if(bo!='') {
+                step_tree = '';
 
-            step_tree='';
+                var myLable = document.createElement("label");
+                myLable.id = "label_" + step_count;
+                myLable.className = 'layui-form-label';
+                myLable.textContent = '\n\n添加步骤' + step_count;
+                document.getElementById('cs').appendChild(myLable);
 
-            var myLable = document.createElement("label");
-            myLable.id="label_"+step_count;
-            myLable.className='layui-form-label';
-            myLable.textContent='\n\n添加步骤'+step_count;
-            document.getElementById('cs').appendChild(myLable);
-
-            var myObj = document.createElement("select");
-            myObj.id="obj_"+step_count;
-            myObj.name=step_count;
-            myObj.onchange=function(){
-                obj_del_ul(this.name);
-                add_ope();
-            };
-
-            document.getElementById('cs').appendChild(myObj);
-            myObj.options.add(new Option("选择控件",""));
-            for (sn in bo){
-                myObj.options.add(new Option(bo[sn].name,bo[sn].id));
-            }
-
-            var myOpe = document.createElement("select");
-            myOpe.id="ope_"+step_count;
-            myOpe.name=step_count;
-            myOpe.form="case_form";
-            myOpe.onchange=function(){
-                ope_del_ul(this.name);
-                if(this.value){
-                    add_step();
+                var myObj = document.createElement("select");
+                myObj.id = "obj_" + step_count;
+                myObj.name = step_count;
+                myObj.onchange = function () {
+                    obj_del_ul(this.name);
+                    add_ope();
+                };
+                document.getElementById('cs').appendChild(myObj);
+                myObj.options.add(new Option("选择控件", ""));
+                alert(bo);
+                for (sn in bo) {
+                    myObj.options.add(new Option(bo[sn].name, bo[sn].id));
                 }
-            };
 
-            document.getElementById('cs').appendChild(myOpe);
-            myOpe.options.add(new Option("选择操作",""));
+                var myOpe = document.createElement("select");
+                myOpe.id = "ope_" + step_count;
+                myOpe.name = step_count;
+                myOpe.form = "case_form";
+                myOpe.onchange = function () {
+                    ope_del_ul(this.name);
+                    if (this.value) {
+                        add_step();
+                    }
+                };
+                document.getElementById('cs').appendChild(myOpe);
+                myOpe.options.add(new Option("选择操作", ""));
 
-            var my_div = document.createElement("div");
-            my_div.id="div_"+step_count;
-            my_div.innerHTML="<br>";
-            document.getElementById('cs').appendChild(my_div);
+                var my_div = document.createElement("div");
+                my_div.id = "div_" + step_count;
+                my_div.innerHTML = "<br>";
+                document.getElementById('cs').appendChild(my_div);
+            }
         }
 
         add_step();
