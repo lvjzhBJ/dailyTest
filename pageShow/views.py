@@ -163,7 +163,7 @@ def pjt2stand(request,un):
     if request.method == 'POST':
 
         stand_id = request.POST.get('stand_pjt_edit')
-        print stand_id
+        print request.POST
 
         Project.objects.filter(stand=1).update(stand=0)
 
@@ -363,6 +363,12 @@ def pjt_edit(request,un,pjt):
         request.session['ver_status'] = '项目' + pjt + '已被删除...'
         return redirect('/' + username)
 
+    if request.method == 'POST':
+        print '*'*8
+        pt = request.POST
+        print pt
+
+        return redirect('/' + username +'/'+pjt+ '/case')
     if request.method == 'GET':
 
         project_info_json = request.session.get('project_info_json')

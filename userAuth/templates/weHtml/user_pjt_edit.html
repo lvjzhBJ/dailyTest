@@ -1,5 +1,32 @@
 {% extends 'base_logon.html' %}
 
+{% block head-css %}
+    <style type="text/css">
+
+        select {
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+            border: solid 1px #adadad;
+            border-radius: 3px;
+            /*很关键：将默认的select选择框样式清除*/
+            appearance:none;
+            -moz-appearance:none;
+            -webkit-appearance:none;
+
+            /*在选择框的最右侧中间显示小箭头图片*/
+            background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center transparent;
+            width: 150px;
+            height: 35px;
+            padding: 2px;
+            margin:3px;
+            font-size: 12px;
+            box-shadow: 0 0 5px #ccc;
+            position: relative;
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/
+            padding-right: 14px;
+        }
+
+    </style>
+ {% endblock %}
 
 {% block body-logon %}
 
@@ -10,13 +37,159 @@
               <a href="/{{ username }}/{{ pjt }}/case">用例列表</a>
               <span class="fly-mid"></span>
               <a href="#" class="layui-this">编辑用例</a>
-        </div>
+            </div>
 
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
-                  <ul style="width: 100%;min-height:350px;padding: 0;"></ul>
-                    待完善...
+              <div style="width: 100%;min-height:350px;padding: 0;">
+                    <ul id="cs"></ul>
+                    <form class="layui-form" id="case_form" method="post">
+                        <div class="layui-form-item layui-form-text">
+                            <ul id="pt" style="display: none"></ul>
+                        </div>
+
+                         <div class="layui-form-item">
+                            <div class="layui-input-block">
+                              <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                            </div>
+                          </div>
+                    </form>
+
+                </div>
               </div>
-      </div>
+            </div>
 
 {% endblock %}
 
+{% block js %}
+
+    <script>
+        var step_count = 1;
+        var bo  = {{ page_info|safe }};
+
+        function del_ul(del_count){
+            for (;del_count<step_count;step_count--){
+                var parent=document.getElementById("cs");
+                var obj_tmp=document.getElementById("obj_"+step_count);
+                var ope_tmp=document.getElementById("ope_"+step_count);
+                var lab_tmp=document.getElementById("label_"+step_count);
+                var div_tmp=document.getElementById("div_"+step_count);
+
+                ul_pt=document.getElementById('pt');
+                obj_pt=document.getElementById('input_obj_'+step_count);
+                ope_pt=document.getElementById('input_ope_'+step_count);
+
+                if (obj_pt){
+                    ul_pt.removeChild(obj_pt);
+                }
+                if (ope_pt){
+                    ul_pt.removeChild(ope_pt);
+                }
+                if (ope_tmp){
+                    parent.removeChild(ope_tmp);
+                }
+                if (lab_tmp){
+                    parent.removeChild(lab_tmp);
+                }
+                if (obj_tmp) {
+                    parent.removeChild(obj_tmp);
+                }
+                if (div_tmp){
+                    parent.removeChild(div_tmp);
+                }
+            }
+        }
+        function obj_del_ul(del_count){
+            if (step_count>del_count){
+                del_ul(del_count);
+            }
+        }
+
+        function ope_del_ul(del_count){
+
+            var obj=document.getElementById("obj_"+(Number(del_count)+1));
+            if (obj){
+                del_ul(del_count);
+                step_count = step_count+1;
+            }
+        }
+
+        function add_ope() {
+            var obj = document.getElementById("obj_"+step_count);
+            var index = obj.selectedIndex;
+            var ope = document.getElementById("ope_"+step_count);
+            ope.innerHTML = '';
+            ope.options.add(new Option('执行操作',''));
+            ope.options.add(new Option(bo[index-1].resource_id.toString(),bo[index-1].id.toString()));
+            step_count = step_count+1;
+            bo=bo[index-1].children;
+        }
+
+        function add_step(){
+            bf = document.getElementById("ope_"+(step_count-1));
+
+            if(bf){
+                var ul_bf = document.createElement("input");
+                ul_bf.id="input_obj_"+step_count;
+                ul_bf.name=bf.id;
+                ul_bf.value=bf.value;
+                ul_pt=document.getElementById('pt');
+                ul_pt.appendChild(ul_bf);
+            }
+
+            of = document.getElementById("obj_"+(step_count-1));
+            if(of){
+                var ul_of = document.createElement("input");
+                ul_of.id="input_ope_"+step_count;
+                ul_of.name=of.id;
+                ul_of.value=of.value;
+                ul_pt=document.getElementById('pt');
+                ul_pt.appendChild(ul_of);
+            }
+
+            step_tree='';
+
+            var myLable = document.createElement("label");
+            myLable.id="label_"+step_count;
+            myLable.className='layui-form-label';
+            myLable.textContent='\n\n添加步骤'+step_count;
+            document.getElementById('cs').appendChild(myLable);
+
+            var myObj = document.createElement("select");
+            myObj.id="obj_"+step_count;
+            myObj.name=step_count;
+            myObj.onchange=function(){
+                obj_del_ul(this.name);
+                add_ope();
+            };
+
+            document.getElementById('cs').appendChild(myObj);
+            myObj.options.add(new Option("选择控件",""));
+            for (sn in bo){
+                myObj.options.add(new Option(bo[sn].name,bo[sn].id));
+            }
+
+            var myOpe = document.createElement("select");
+            myOpe.id="ope_"+step_count;
+            myOpe.name=step_count;
+            myOpe.form="case_form";
+            myOpe.onchange=function(){
+                ope_del_ul(this.name);
+                if(this.value){
+                    add_step();
+                }
+            };
+
+            document.getElementById('cs').appendChild(myOpe);
+            myOpe.options.add(new Option("选择操作",""));
+
+            var my_div = document.createElement("div");
+            my_div.id="div_"+step_count;
+            my_div.innerHTML="<br>";
+            document.getElementById('cs').appendChild(my_div);
+
+        }
+
+        add_step();
+
+    </script>
+{% endblock %}
