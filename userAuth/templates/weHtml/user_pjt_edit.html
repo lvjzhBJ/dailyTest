@@ -98,13 +98,8 @@
 
         function reset_bo() {
             bo  = {{ page_info|safe }};
-
-            for (var i=0;i<step_count-1;i++)
-            {
-                alert(i);
-                alert(arr_bo[i]);
+            for (var i=0;i<step_count-1;i++) {
                 bo=bo[arr_bo[i]-1].children;
-                alert(3);
             }
         }
 
