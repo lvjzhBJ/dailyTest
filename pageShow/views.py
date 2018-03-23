@@ -368,7 +368,7 @@ def pjt_edit(request,un,pjt):
         pt = request.POST
         print pt
 
-        return redirect('/' + username +'/'+pjt+ '/case')
+        return redirect('/' + username +'/'+pjt+ '/manage')
     if request.method == 'GET':
 
         project_info_json = request.session.get('project_info_json')
@@ -453,13 +453,9 @@ def pjt_func(request,un,pjt):
         email = request.session.get('email')
         userid = request.session.get('userid')
 
-        pjt_on = Project.objects.filter(pjt_name=pjt)
-        rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
+        page_info = get_pages(pjt_on[0].id)
+        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
 
-        test_case_info = {'status': 0}
-        if rpt:
-            test_case_info['status'] = 1
-            test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
         return render_to_response('weHtml/user_pjt_function.html',
                                   {'project_info_json': project_info_json,
                                    'email': email,
@@ -467,8 +463,43 @@ def pjt_func(request,un,pjt):
                                    'pjt': pjt,
                                    'pjt_id': pjt_on[0].id,
                                    'userid': userid,
-                                   'test_case_info': test_case_info})
+                                   'page_info_json': page_info_json})
 
+
+@csrf_exempt
+def pjt_manage(request,un,pjt):
+    username = request.session.get('username')
+    if un != username:
+        return redirect('/login')
+
+    user_pjt = User.objects.filter(username=un)
+    if not user_pjt:
+        request.session['ver_status'] = '用户' + un + '已被删除...'
+        return redirect('/login')
+
+    pjt_on = Project.objects.filter(pjt_name=pjt, pjt_owner=user_pjt[0])
+
+    if not pjt_on:
+        request.session['ver_status'] = '项目' + pjt + '已被删除...'
+        return redirect('/' + username)
+
+    if request.method == 'GET':
+
+        project_info_json = request.session.get('project_info_json')
+        email = request.session.get('email')
+        userid = request.session.get('userid')
+
+        page_info = get_pages(pjt_on[0].id)
+        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
+
+        return render_to_response('weHtml/user_pjt_manage.html',
+                                  {'project_info_json': project_info_json,
+                                   'email': email,
+                                   'username': username,
+                                   'pjt': pjt,
+                                   'pjt_id': pjt_on[0].id,
+                                   'userid': userid,
+                                   'page_info_json': page_info_json})
 
 '''
 report
