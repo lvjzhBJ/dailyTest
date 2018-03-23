@@ -34,7 +34,9 @@
               <span class="fly-mid"></span>
               <a href="/{{ username }}/{{ pjt }}/fcs">功能点用例</a>
               <span class="fly-mid"></span>
-              <a href="#" class="layui-this">编辑用例</a>
+              <a href="/{{ username }}/{{ pjt }}/manage">管理用例</a>
+              <span class="fly-mid"></span>
+              <a href="#" class="layui-this">添加用例</a>
             </div>
 
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
@@ -163,7 +165,7 @@
                 ul_pt=document.getElementById('pt');
                 ul_pt.appendChild(ul_of);
             }
-            if(bo!='') {
+            if(bo!="") {
                 step_tree = '';
 
                 var myLable = document.createElement("label");
@@ -195,6 +197,7 @@
                         add_step();
                     }
                 };
+
                 document.getElementById('cs').appendChild(myOpe);
                 myOpe.options.add(new Option("选择操作", ""));
 

@@ -1,0 +1,80 @@
+{% extends 'base_logon.html' %}
+
+
+{% block body-logon %}
+      <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="/{{ username }}/{{ pjt }}/show">结构展示</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/case">流程用例</a>
+              <span class="fly-mid"></span>
+              <a href="#" class="layui-this">功能点用例</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/manage">管理用例</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/edit">添加用例</a>
+          </div>
+
+          <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+              <ul style="width: 100%;min-height:350px;padding: 0;">
+                  {% if page_info_json != 'null'  %}
+                      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                          <legend>项目:{{ pjt }}</legend>
+                      </fieldset>
+                      <div class="layui-collapse" lay-filter="test">
+                          <ul id="func_show"></ul>
+                      </div>
+                  {% else %}
+                      <a>测试未执行，请等待</a>
+                  {% endif %}
+              </ul>
+          </div>
+      </div>
+{% endblock %}
+
+{% block js %}
+
+    <script>
+        var pij  = {{ page_info_json|safe }};
+        var fcs = document.getElementById('func_show');
+        var pij_html='';
+        var case_seq=1;
+
+        function show_case(_pij){
+            for(page_i in _pij){
+                if(_pij[page_i].children) {
+                    var page=_pij[page_i];
+                    for(obj_i in page.children) {
+                        var obj = page.children[obj_i];
+                        pij_html = pij_html + '<div class="layui-colla-item"><h2 class="layui-colla-title">TestCase.' +case_seq+ '&nbsp&nbsp验证_';
+                        pij_html = pij_html + '[<i style="color: #007DDB;">' + obj.name + '</i>]</h2>';
+
+                        pij_html = pij_html + '<div class="layui-colla-content"><p>';
+                        pij_html = pij_html + '<i style="color: seagreen;">&nbsp&nbspstep&nbsp1&nbsp&nbsp</i>';
+                        pij_html = pij_html + '查看页面__【<i style="color: #007DDB;">' + page.name + '</i>】</p></div>';
+
+                        pij_html = pij_html + '<div class="layui-colla-content"><p>';
+                        pij_html = pij_html + '<i style="color: seagreen;">&nbsp&nbspstep&nbsp2&nbsp&nbsp</i>';
+                        pij_html = pij_html + '  检验__【<i style="color: #007DDB;">' + obj.name + '</i>】';
+                        pij_html = pij_html + '</p></div></div>';
+                        case_seq++;
+                    }
+                }
+            }
+        }
+
+        var fget = function (n){
+            if (n){
+                show_case(n);
+            }
+            for(i in n){
+                if(n[i].children) {
+                    fget(n[i].children);
+                }
+            }
+        };
+        fget(pij);
+        fcs.innerHTML = pij_html;
+
+    </script>
+{% endblock %}

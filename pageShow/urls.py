@@ -20,9 +20,10 @@ from . import views
 
 urlpatterns = [
     url(r'^del_pjt/(?P<pjt>.*)/$', views.del_pjt),
-    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/show/$', views.rpt_show),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/flow/$', views.rpt_flow),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/report/sum/$', views.rpt_sum),
-    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/playback/$', views.rpt_playback),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/fcs/$', views.rpt_function),
+    url(r'^(?P<un>.*)/(?P<pjt>.*)/report/manual/$', views.rpt_manual),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/show/$', views.pjt_show),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/edit/$', views.pjt_edit),
     url(r'^(?P<un>.*)/(?P<pjt>.*)/case/$', views.pjt_case),

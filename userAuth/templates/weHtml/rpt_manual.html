@@ -1,0 +1,22 @@
+{% extends 'base_logon.html' %}
+
+   {% block body-logon %}
+
+        <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="/{{ username }}/{{ pjt }}/report/sum">测试概要</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/flow">流程测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/fcs">功能点测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="#" class="layui-this">手工测试报告</a>
+        </div>
+
+        <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+
+        </div>
+   </div>
+
+   {% endblock %}
+

@@ -1,0 +1,148 @@
+{% extends 'base_logon.html' %}
+   {% block body-logon %}
+
+   <div class="fly-panel" style="margin-bottom: 0;">
+          <div class="fly-panel-title fly-filter">
+              <a href="/{{ username }}/{{ pjt }}/report/sum">测试概要</a>
+              <span class="fly-mid"></span>
+              <a href="#" class="layui-this">流程测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/fcs">功能点测试报告</a>
+              <span class="fly-mid"></span>
+              <a href="/{{ username }}/{{ pjt }}/report/manual">手工测试报告</a>
+        </div>
+
+        <div class="layui-col-md-offset0 fly-panel-main fly-filter">
+            <ul style="width: 100%;min-height:350px;padding: 0;">
+
+                {% if test_case_info.status  %}
+                      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                          <legend>项目:{{ pjt }}</legend>
+                      </fieldset>
+                      <div class="layui-collapse" lay-filter="test">
+                              {% for i in test_case_info.test_case_list %}
+                                    <div class="layui-colla-item">
+                                                <h2 class="layui-colla-title">
+                                                {% with i|last as t %}
+                                                TestCase.{{ forloop.counter }}&nbsp&nbsp验证_
+                                                    {% if t.text != 'no_value' %}
+                                                        [<i style="color: #286090;">{{ t.text }}</i>]
+                                                    {% endif %}
+                                                    {% if t.resource_id != 'no_value' %}
+                                                        [<i style="color: #5b80b2;">{{ t.resource_id }}</i>]
+                                                    {% endif %}
+                                                {% endwith %}
+                                                </h2>
+
+                                            <div class="layui-colla-content">
+                                                <p>
+                                                    <h onclick="show_flow('{{ forloop.counter }}');">用例执行流</h>
+
+                                                    <h onclick="show_dyn('{{ forloop.counter }}');">动态操作</h>
+                                                </p>
+                                            </div>
+
+                                            {% for j in i %}
+                                                <div class="layui-colla-content">
+                                                <p>
+                                                    {% if j.is_run_error == 0 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #1E9FFF;">&#xe63d;</i>
+                                                    {% elif j.is_run_error == 1 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #449d44;">&#xe6af;</i>
+                                                    {% elif j.is_run_error == 3 %}
+                                                        <i class="layui-icon" style="font-size: 15px; color: #E6162D;">&#xe69c;</i>
+                                                    {% else %}
+                                                        {{ j.is_run_error }}
+                                                    {% endif %}
+
+                                                <i style="color: seagreen;">&nbsp&nbspstep&nbsp{{ forloop.counter }}&nbsp&nbsp</i>
+                                                    {% if '[ROOT]' in j.text %}
+                                                        显示根页面__
+                                                        [<i style="color: #286090;">{{ j.text }}</i>]
+                                                    {% elif '[PAGE]' in j.text %}
+                                                        显示页面__
+                                                        [<i style="color: #286090;">{{ j.text }}</i>]
+                                                    {% else %}
+                                                        点击
+                                                            {% if j.text != 'no_value' %}
+                                                                [<i style="color: #286090;">{{ j.text }}</i>]
+                                                            {% endif %}
+                                                            {% if j.resource_id != 'no_value' %}
+                                                                [<i style="color: #5b80b2;">{{ j.resource_id }}</i>]
+                                                            {% endif %}
+                                                    {% endif %}
+                                                </p>
+                                                </div>
+                                            {% endfor %}
+                              {% endfor %}
+                        </div>
+                      </div>
+                    {% else %}
+                        <a>测试未执行，请等待</a>
+                  {% endif %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+    var rpt_list = {{ rpt_json|safe }}
+    function show_flow(ft) {
+        var show_ft = '';
+        for (i in rpt_list[ft]){
+            show_ft = show_ft+
+            '<li class="layui-timeline-item">' +
+                '<i class="layui-icon layui-timeline-axis">&#xe63f;</i>' +
+                '<div class="layui-timeline-content layui-text">\n<h3 class="layui-timeline-title" style="color: #BDB76B;">' +
+                'step.'+(i)+'<a style="color: #222222;">';
+            if (rpt_list[ft][i].text.indexOf("[PAGE]")>-1){
+                show_ft = show_ft+'<br />显示'+rpt_list[ft][i].text;
+            } else if(rpt_list[ft][i].text.indexOf("[ROOT]")>-1) {
+                show_ft = show_ft+'<br />显示'+rpt_list[ft][i].text;
+            } else{
+                if(rpt_list[ft][i].operation.indexOf("scrollable")>-1){show_ft = show_ft +'<br />滑动 [';}
+                if(rpt_list[ft][i].operation.indexOf("clickable")>-1){show_ft = show_ft +'<br />点击 [';}
+                if (rpt_list[ft][i].text.indexOf("no_value")<0){show_ft = show_ft + rpt_list[ft][i].text;}
+                if (rpt_list[ft][i].resource_id.indexOf("no_value")<0){show_ft = show_ft + rpt_list[ft][i].resource_id;}
+            }
+
+            show_ft = show_ft+ ']</a></h3><p>\n'
+                + rpt_list[ft][i].is_run_error
+                {#+rpt_list[ft][i].text#}
+                {#+rpt_list[ft][i].resource_id#}
+                +'<img style="border:1px #FF00FF solid;" height="100px" src="/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/bo_'+rpt_list[ft][i].id+'.jpg" alt="None" />'
+                +'\n</p>\n</div>\n</li>';
+        }
+        layer.open({
+              type: 1,
+              title: false,
+              closeBtn: 0,
+              shadeClose: true,
+              skin: 'yourclass',
+                content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #FF00FF; font-weight: 300;">' +
+                show_ft +
+                '</div>'
+            });
+    };
+    function show_dyn(dt){
+        var show_ft = '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/';
+        for (i in rpt_list[dt]){
+            show_ft = show_ft+ rpt_list[dt][i].id;
+        }
+        show_ft = show_ft+'.gif';
+        {#alert(show_ft);#}
+        layer.open({
+              type: 1,
+              title: false,
+              closeBtn: 0,
+              shadeClose: true,
+              skin: 'yourclass',
+                content: '<div style="padding: 20px; line-height: 22px; background-color: #393D49; color: #FF00FF; font-weight: 300;">' +
+                '<img style="border:1px #FF00FF solid;" height="300px" src='+show_ft+' alt="None_" />' +
+                '</div>'
+        });
+    }
+    </script>
+
+{% endblock %}

@@ -335,7 +335,7 @@ def pjt_show(request,un,pjt):
         page_info_json = json.dumps(page_info, cls=CJsonEncoder)
         request.session['page_info_json'] = page_info_json
 
-        return render_to_response('weHtml/user_pjt_show.html',
+        return render_to_response('weHtml/pjt_show.html',
                                   {'project_info_json':project_info_json,
                                    'userid': userid,
                                    'username':username,
@@ -379,8 +379,8 @@ def pjt_edit(request,un,pjt):
         page_info_json = json.dumps(page_info, cls=CJsonEncoder)
         request.session['page_info_json'] = page_info_json
 
-        return render_to_response('weHtml/user_pjt_edit.html',
-                                    {'project_info_json':project_info_json,
+        return render_to_response('weHtml/pjt_edit.html',
+                                  {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
@@ -420,8 +420,8 @@ def pjt_case(request,un,pjt):
         if rpt:
             test_case_info['status'] = 1
             test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
-        return render_to_response('weHtml/user_pjt_case.html',
-                                        {'project_info_json':project_info_json,
+        return render_to_response('weHtml/pjt_case.html',
+                                  {'project_info_json':project_info_json,
                                        'email':email,
                                        'username':username,
                                        'pjt':pjt,
@@ -456,7 +456,7 @@ def pjt_func(request,un,pjt):
         page_info = get_pages(pjt_on[0].id)
         page_info_json = json.dumps(page_info, cls=CJsonEncoder)
 
-        return render_to_response('weHtml/user_pjt_function.html',
+        return render_to_response('weHtml/pjt_function.html',
                                   {'project_info_json': project_info_json,
                                    'email': email,
                                    'username': username,
@@ -492,7 +492,7 @@ def pjt_manage(request,un,pjt):
         page_info = get_pages(pjt_on[0].id)
         page_info_json = json.dumps(page_info, cls=CJsonEncoder)
 
-        return render_to_response('weHtml/user_pjt_manage.html',
+        return render_to_response('weHtml/pjt_manage.html',
                                   {'project_info_json': project_info_json,
                                    'email': email,
                                    'username': username,
@@ -506,7 +506,7 @@ report
 '''
 
 @csrf_exempt
-def rpt_show(request,un,pjt):
+def rpt_sum(request,un,pjt):
     username = request.session.get('username')
 
     project_info_json = request.session.get('project_info_json')
@@ -534,7 +534,7 @@ def rpt_show(request,un,pjt):
 
     test_case_data = [[pass_int, "#2dc6c8", "Pass"], [fail_int, "#d7797f", "Fail"], [block_int, "#5ab1ee", "Block"], [na_int, "#b6a2dd", "NA"]]
 
-    rsp = render(request, 'weHtml/rpt_show.html', {'username': username,
+    rsp = render(request, 'weHtml/rpt_sum.html', {'username': username,
                                                    'email': email,
                                                    'pjt': pjt,
                                                    'rpt':'报告',
@@ -542,11 +542,12 @@ def rpt_show(request,un,pjt):
                                                    'userid':userid,
                                                    'test_case_info':test_case_info,
                                                    'test_case_data': json.dumps(test_case_data),
-                                                   'project_info_json': project_info_json})
+                                                  'project_info_json': project_info_json})
     return rsp
 
+
 @csrf_exempt
-def rpt_sum(request,un,pjt):
+def rpt_flow(request,un,pjt):
     username = request.session.get('username')
 
     project_info_json = request.session.get('project_info_json')
@@ -564,7 +565,7 @@ def rpt_sum(request,un,pjt):
         test_case_info['test_case_list'] = rpt
 
 
-    rsp = render(request, 'weHtml/rpt_sum.html', {'username': username,
+    rsp = render(request, 'weHtml/rpt_flow.html', {'username': username,
                                               'email': email,
                                               'pjt': pjt,
                                               'rpt':'报告',
@@ -572,12 +573,12 @@ def rpt_sum(request,un,pjt):
                                               'userid':userid,
                                                 'rpt_json':json.dumps(rpt),
                                               'test_case_info': test_case_info,
-                                              'project_info_json': project_info_json})
+                                                   'project_info_json': project_info_json})
     return rsp
 
 
 @csrf_exempt
-def rpt_playback(request,un,pjt):
+def rpt_function(request,un,pjt):
     username = request.session.get('username')
 
     project_info_json = request.session.get('project_info_json')
@@ -593,7 +594,7 @@ def rpt_playback(request,un,pjt):
         test_case_info['status'] = 1
         test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
 
-    rsp = render(request, 'weHtml/rpt_playback.html', {'username': username,
+    rsp = render(request, 'weHtml/rpt_function.html', {'username': username,
                                                        'email': email,
                                                        'pjt': pjt,
                                                        'rpt':'报告',
@@ -603,3 +604,30 @@ def rpt_playback(request,un,pjt):
                                                        'project_info_json': project_info_json})
     return rsp
 
+
+@csrf_exempt
+def rpt_manual(request,un,pjt):
+    username = request.session.get('username')
+
+    project_info_json = request.session.get('project_info_json')
+    email = request.session.get('email')
+    userid = request.session.get('userid')
+
+    pjt_on = Project.objects.filter(pjt_name=pjt)
+    rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
+
+    test_case_info={}
+    test_case_info['status'] = 0
+    if rpt:
+        test_case_info['status'] = 1
+        test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
+
+    rsp = render(request, 'weHtml/rpt_manual.html', {'username': username,
+                                                       'email': email,
+                                                       'pjt': pjt,
+                                                       'rpt':'报告',
+                                                       'pjt_id':pjt_on[0].id,
+                                                       'userid':userid,
+                                                       'test_case_info': test_case_info,
+                                                       'project_info_json': project_info_json})
+    return rsp
