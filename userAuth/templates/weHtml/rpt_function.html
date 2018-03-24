@@ -15,45 +15,93 @@
 
        <div class="layui-col-md-offset0 fly-panel-main fly-filter">
             <div style="width: 100%;min-height:350px;padding: 0;">
-
-          <div class="layui-collapse">
-          <div class="layui-colla-item">
-            <h2 class="layui-colla-title">项目:{{ pjt }}</h2>
-            <div class="layui-colla-content layui-show">
-                <div class="layui-container">
-                    <div class="layui-row">
-                        <div class="layui-col-md2">
-{#                            <dl class="layui-nav-child">#}
-                        <ul class="layui-tree"></ul>
-                            {% if test_case_info.status  %}
-                                {% for i in test_case_info.test_case_list %}
-                                    <li class="siteTag"><a onclick="
-                                    document.getElementById('case_img').innerHTML= ''+
-                                    '<img style=\'border:1px #FF00FF solid;\' height=\'300px\' src=\'' +
-                                         '/pageGet/media/img/user{{ userid }}/pjt{{ pjt_id }}/'+
-                                            {% for j in i %}
-                                                 {{ j.id }} +
-                                            {% endfor %}
-                                            '.gif\' alt=\'None_\' />'+
-                                    '';" href="#"><cite>test_case_{{ forloop.counter }}</cite><em></em></a></li>
-
-                                {% endfor %}
-                            {% else %}
-                                <h2>测试未执行，请等待</h2>
-                            {% endif %}
-                        </div>
-                        <div class="layui-col-md6">
-                            <ul class="layui-timeline">
-                                <ul id="case_img"></ul>
-                            </ul>
-                        </div>
-                  </div>
-                </div>
+                {% if page_info_json != 'null'  %}
+                      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                          <legend>项目:{{ pjt }}</legend>
+                      </fieldset>
+                      <div class="layui-collapse" lay-filter="test">
+                          <ul id="func_show"></ul>
+                      </div>
+                  {% else %}
+                      <a>测试未执行，请等待</a>
+                  {% endif %}
             </div>
-          </div>
-          </div>
-            </div>
+       {{ page_info_json }}
        </div>
 </div>
 {% endblock %}
 
+
+{% block js %}
+
+    <script>
+        var pij  = {{ page_info_json|safe }};
+        var userid = {{ userid|safe }};
+        var pjt_id={{ pjt_id|safe }};
+        var fcs = document.getElementById('func_show');
+        var pij_html='';
+        var case_seq=1;
+
+        function show_img(i,j){
+
+            var show_i = '<img style="border:1px #FF00FF solid;" height="300px" src="/pageGet/media/img/user'+userid+'/pjt'+pjt_id+'/bo_'+i+'.jpg" alt="None" />';
+            var show_j = '<img style="border:1px #FF00FF solid;" height="300px" src="/pageGet/media/img/user'+userid+'/pjt'+pjt_id+'/bo_'+j+'.jpg" alt="None" />';
+
+            document.getElementById('btn_'+j).disabled=true;
+            document.getElementById('icon_'+j).innerHTML='&#xe651;';
+            document.getElementById('page_'+j).style.color="#ff0000";
+            layer.msg(show_i,{
+                type: 1,
+                offset: 'auto',
+                anim: 7,
+                isOutAnim: false,
+                time:1500
+            }, function(){
+                document.getElementById('page_'+j).style.color="seagreen";
+                document.getElementById('obj_'+j).style.color="#ff0000";
+                layer.msg(show_j,{
+                    type: 1,
+                    offset: 'auto',
+                    anim: 7,
+                    isOutAnim: false,
+                    time:1500
+                }, function(){
+                    document.getElementById('obj_'+j).style.color="seagreen";
+                    document.getElementById('icon_'+j).innerHTML='&#xe652;';
+                    document.getElementById('btn_'+j).disabled=false;
+                });
+            });
+        }
+
+        function show_case(_pij){
+            for(page_i in _pij){
+                if(_pij[page_i].children) {
+                    var page=_pij[page_i];
+                    for(obj_i in page.children) {
+                        var obj = page.children[obj_i];
+                        pij_html = pij_html + '<div class="layui-colla-item">' +
+                            '<h2 class="layui-colla-title">TestCase.' +case_seq+ '&nbsp&nbsp验证_';
+                        pij_html = pij_html + '[<i style="color: #007DDB;">' + obj.name + '</i>]</h2>';
+                        pij_html = pij_html + '<div class="layui-colla-content"><p>';
+                        pij_html = pij_html + '<i id="page_'+obj.id+'" style="color: seagreen;">&nbsp&nbspstep&nbsp1&nbsp&nbsp</i>';
+                        pij_html = pij_html + '查看页面__【<i style="color: #007DDB;">' + page.name + '</i>】</p></div>';
+
+                        pij_html = pij_html + '<div class="layui-colla-content"><p>';
+                        pij_html = pij_html + '<i id="obj_'+obj.id+'" style="color: seagreen;">&nbsp&nbspstep&nbsp2&nbsp&nbsp</i>';
+                        pij_html = pij_html + '检验__【<i style="color: #007DDB;">' + obj.name + '</i>】';
+                        pij_html = pij_html + '</p></div>';
+                        pij_html = pij_html + '<div class="layui-colla-content"><p>' +
+                            '<button class="layui-btn layui-btn-xs" id="btn_'+obj.id+'" onclick="show_img('+page.id+','+obj.id+');">' +
+                            '<i class="layui-icon " id="icon_'+obj.id+'">&#xe652;</i>预览</button></p></div></div>';
+                        case_seq++;
+                    }
+                }
+            }
+        }
+
+        var fget = function (n){if (n){show_case(n);}for(i in n){if(n[i].children) {fget(n[i].children);}}};
+        fget(pij);
+        fcs.innerHTML = pij_html;
+
+    </script>
+{% endblock %}

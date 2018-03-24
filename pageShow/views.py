@@ -573,7 +573,7 @@ def rpt_flow(request,un,pjt):
                                               'userid':userid,
                                                 'rpt_json':json.dumps(rpt),
                                               'test_case_info': test_case_info,
-                                                   'project_info_json': project_info_json})
+                                                'project_info_json': project_info_json})
     return rsp
 
 
@@ -586,13 +586,9 @@ def rpt_function(request,un,pjt):
     userid = request.session.get('userid')
 
     pjt_on = Project.objects.filter(pjt_name=pjt)
-    rpt = ResponseRpt.objects.filter(pjt_id=pjt_on[0].id)
 
-    test_case_info={}
-    test_case_info['status'] = 0
-    if rpt:
-        test_case_info['status'] = 1
-        test_case_info['test_case_list'] = pickle.loads(rpt[0].rpt_info)
+    page_info = get_pages(pjt_on[0].id)
+    page_info_json = json.dumps(page_info, cls=CJsonEncoder)
 
     rsp = render(request, 'weHtml/rpt_function.html', {'username': username,
                                                        'email': email,
@@ -600,7 +596,7 @@ def rpt_function(request,un,pjt):
                                                        'rpt':'报告',
                                                        'pjt_id':pjt_on[0].id,
                                                        'userid':userid,
-                                                       'test_case_info': test_case_info,
+                                                       'page_info_json': page_info_json,
                                                        'project_info_json': project_info_json})
     return rsp
 
