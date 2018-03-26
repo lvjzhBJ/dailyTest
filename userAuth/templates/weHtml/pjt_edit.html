@@ -41,16 +41,22 @@
 
           <div class="layui-col-md-offset0 fly-panel-main fly-filter">
               <div  style="width: 100%;min-height:350px;padding: 0;">
-                    <ul id="iis">112</ul>
-                    <ul id="cs"></ul>
-                    <form class="layui-form" id="case_form" method="post">
-                        <div class="layui-form-item layui-form-text">
+
+                  <ul style="width: 60%;padding: 0;float:left;" id="cs"></ul>
+                  <ul style="width: 140px;padding: 0;float:left;" id="iis"></ul>
+
+                  <form class="layui-form" id="case_form" method="post"">
+
+                        <div class="layui-form-item layui-form-text" >
                             <ul id="pt" style="display: none"></ul>
                         </div>
-
                          <div class="layui-form-item">
-                            <div class="layui-input-block">
-                              <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                             <label class="layui-form-label">用例名称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="case_title" required lay-verify="required" placeholder="请输入用例名称" class="layui-input">
+                                </div>
+                            <div class="layui-input-inline">
+                              <button class="layui-btn" lay-submit="" lay-filter="case_submit">提交用例</button>
                             </div>
                           </div>
                     </form>
@@ -209,7 +215,7 @@
                 iis.innerHTML='';
                 for (i in arr_img){
                     i_path="/pageGet/media/img/user"+userid+"/pjt"+pjt_id+"/bo_"+arr_img[i]+".jpg";
-                    iis.innerHTML = iis.innerHTML + '<img style="border:1px #FF00FF solid;" height="100px" src="'+i_path+'" alt="None" />';
+                    iis.innerHTML = iis.innerHTML + '<img style="border:1px #FF00FF solid;" height="110px" src="'+i_path+'" alt="None" />';
                 }
             }
         }

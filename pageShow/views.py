@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-import sys,os
+import sys
 import time
 import pickle
 from django import forms
-from PIL import Image
 from django.shortcuts import render,render_to_response,HttpResponse,redirect
 from userAuth.models import User
-from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt
-from images2gif import writeGif
+from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt,ManualCase
 from django.views.decorators.csrf import csrf_exempt
 from userAuth.utils.time2json import CJsonEncoder
 
@@ -364,11 +362,30 @@ def pjt_edit(request,un,pjt):
         return redirect('/' + username)
 
     if request.method == 'POST':
-        print '*'*8
         pt = request.POST
         print pt
+        case=[]
+        for i in range(len(pt)/2):
+            step = []
+            step.append(pt.get('obj_' + str(i + 1)))
+            step.append(pt.get('ope_' + str(i + 1)))
+            case.append(step)
+        case_list = [case]
+        case_in_db, is_new = ManualCase.objects.get_or_create(pjt_id=pjt_on[0].id,
+                                        defaults={'case_info': pickle.dumps(case_list)})
+        if is_new:
+            request.session['case_list_session'] = case_list
+        else:
+            case_in = pickle.loads(case_in_db.case_info)
+            if case not in case_in:
+                print case_in
+                case_in.append(case)
+                case_in_db.case_info = pickle.dumps(case_in)
+                case_in_db.save()
+            request.session['case_list_session'] = case_in
 
         return redirect('/' + username +'/'+pjt+ '/manage')
+
     if request.method == 'GET':
 
         project_info_json = request.session.get('project_info_json')
@@ -488,10 +505,12 @@ def pjt_manage(request,un,pjt):
         project_info_json = request.session.get('project_info_json')
         email = request.session.get('email')
         userid = request.session.get('userid')
+        case_list = request.session.get('case_list')
 
-        page_info = get_pages(pjt_on[0].id)
-        page_info_json = json.dumps(page_info, cls=CJsonEncoder)
-
+        if not case_list:
+            case_list_db=ManualCase.objects.filter(pjt_id=pjt_on[0].id)
+            if case_list_db:
+                case_list=pickle.loads(case_list_db[0].case_info)
         return render_to_response('weHtml/pjt_manage.html',
                                   {'project_info_json': project_info_json,
                                    'email': email,
@@ -499,7 +518,7 @@ def pjt_manage(request,un,pjt):
                                    'pjt': pjt,
                                    'pjt_id': pjt_on[0].id,
                                    'userid': userid,
-                                   'page_info_json': page_info_json})
+                                   'case_list': case_list})
 
 '''
 report

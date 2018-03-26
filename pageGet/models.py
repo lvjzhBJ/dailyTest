@@ -100,12 +100,13 @@ class ResponseRptAdmin(admin.ModelAdmin):
 admin.site.register(ResponseRpt, ResponseRptAdmin)
 
 
-class ObjectImg(MPTTModel):
-    img = models.ImageField(upload_to='img',default='logo/2w.png')
-    parent = models.ForeignKey(ResponsePage)
+class ManualCase(models.Model):
+    pjt_id = models.IntegerField(default=0)
+    case_info = models.CharField(max_length=32768,null=True)
 
 
-class ObjectImgAdmin(admin.ModelAdmin):
-    list_display = ('id','img','parent')
+class ManualCaseAdmin(admin.ModelAdmin):
+    list_display = ('id','pjt_id','case_info')
 
-admin.site.register(ObjectImg, ObjectImgAdmin)
+admin.site.register(ManualCase, ManualCaseAdmin)
+

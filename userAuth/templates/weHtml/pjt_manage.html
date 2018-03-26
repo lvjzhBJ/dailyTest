@@ -16,15 +16,15 @@
     </div>
     <div class="layui-col-md-offset0 fly-panel-main fly-filter">
         <div style="width: 100%;min-height:340px;padding: 0;">
-            {% if project_info_json %}
+            {% if case_list %}
                 <table class="layui-table" id="table_del"><colgroup>
                     <col width="25"><col width="25"><col><col width="10"><col></colgroup>
-                    <thead><tr><th>ID</th><th>项目</th><th>安装包名</th><th>DEL</th></tr></thead>
+                    <thead><tr><th>ID</th><th>name</th><th>操作步骤</th><th>DEL</th></tr></thead>
                     <tbody>
-                    {% for i in project_info_json %}
-                        <tr><td>{{ i.id }}</td>
-                            <td>{{ i.pjt_name }}</td>
-                            <td>{{ i.app_file }}</td>
+                    {% for i in case_list %}
+                        <tr><td>{{ forloop.counter}}</td>
+                            <td>1</td>
+                            <td>{{ i }}</td>
                             <td>
                                 <a class="layui-btn layui-btn-sm" onclick="deleteRow(this,'{{ i.pjt_name }}')">
                                     <i class="layui-icon">&#xe640;</i>
