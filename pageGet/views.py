@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import os
 from django.core.files.base import ContentFile
 import traceback
-from pageGet.models import Project,ResponsePage,ResponseRpt
+from pageGet.models import Project,ResponsePage,ResponseRpt,ManualCase
 from userAuth.models import User
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
@@ -26,6 +26,7 @@ def pjt2client(request):
                         'pjt_owner':pjt_on[0].pjt_owner.id}
             rsp = JsonResponse(pjt_dict, safe=False)
             return rsp
+
 
 @csrf_exempt
 def client2json(request):
@@ -116,5 +117,19 @@ def clean_apk(request):
                         print 'no such file:%s' % img_path+i
 
             return HttpResponse(acc_pjt, content_type='application/json')
+        except:
+            return HttpResponse(traceback.format_exc(), content_type='application/json')
+
+
+@csrf_exempt
+def manual_case(request):
+    if request.method == 'POST':
+        try:
+            get_json = request.POST
+            id = get_json.get('pjt_id')
+
+            case_list_db=ManualCase.objects.filter(pjt_id=id)
+
+            return HttpResponse(case_list_db, content_type='application/json')
         except:
             return HttpResponse(traceback.format_exc(), content_type='application/json')

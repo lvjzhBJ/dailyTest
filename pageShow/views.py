@@ -363,14 +363,13 @@ def pjt_edit(request,un,pjt):
 
     if request.method == 'POST':
         pt = request.POST
-        print pt
         case=[]
-        for i in range(len(pt)/2):
+        for i in range((len(pt)-1)/2):
             step = []
             step.append(pt.get('obj_' + str(i + 1)))
             step.append(pt.get('ope_' + str(i + 1)))
             case.append(step)
-        case_list = [case]
+        case_list = [[pt.get('case_title'),case]]
         case_in_db, is_new = ManualCase.objects.get_or_create(pjt_id=pjt_on[0].id,
                                         defaults={'case_info': pickle.dumps(case_list)})
         if is_new:
@@ -379,7 +378,7 @@ def pjt_edit(request,un,pjt):
             case_in = pickle.loads(case_in_db.case_info)
             if case not in case_in:
                 print case_in
-                case_in.append(case)
+                case_in.append([pt.get('case_title'),case])
                 case_in_db.case_info = pickle.dumps(case_in)
                 case_in_db.save()
             request.session['case_list_session'] = case_in
@@ -519,6 +518,34 @@ def pjt_manage(request,un,pjt):
                                    'pjt_id': pjt_on[0].id,
                                    'userid': userid,
                                    'case_list': case_list})
+
+
+@csrf_exempt
+def del_case(request,un,pjt,cn):
+
+    if request.method == 'GET':
+        username = request.session.get('username')
+        userid = request.session.get('userid')
+        user = User.objects.filter(username=username, id=userid)
+
+        if not user:
+            request.session['ver_status'] = 'FAIL_用户失效,请重新登录...'
+            return redirect('/' + username + '/del/')
+
+        project_db_old = Project.objects.filter(pjt_owner=user[0],pjt_name = pjt)
+        if not project_db_old:
+            request.session['ver_status'] = 'FAIL_项目不存在,请重试...'
+        else:
+            case_list_db=ManualCase.objects.filter(pjt_id=project_db_old[0].id)
+            if case_list_db:
+                case_list = pickle.loads(case_list_db[0].case_info)
+                for i in case_list:
+                    if i[0] == cn:
+                        case_list.remove(i)
+                        case_list_db[0].case_info=pickle.dumps(case_list)
+                        case_list_db[0].save()
+
+        return redirect('/' + username + '/' + pjt +'/manage/')
 
 '''
 report

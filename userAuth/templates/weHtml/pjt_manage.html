@@ -17,16 +17,21 @@
     <div class="layui-col-md-offset0 fly-panel-main fly-filter">
         <div style="width: 100%;min-height:340px;padding: 0;">
             {% if case_list %}
-                <table class="layui-table" id="table_del"><colgroup>
+                <table class="layui-table" id="case_del"><colgroup>
                     <col width="25"><col width="25"><col><col width="10"><col></colgroup>
                     <thead><tr><th>ID</th><th>name</th><th>操作步骤</th><th>DEL</th></tr></thead>
                     <tbody>
                     {% for i in case_list %}
                         <tr><td>{{ forloop.counter}}</td>
-                            <td>1</td>
-                            <td>{{ i }}</td>
+                            <td>{{ i.0 }}</td>
+                            <td>{% for j in i.1 %}
+                                <i class="layui-icon" style="font-size: 15px; color: #1E9FFF;">&#xe63b;{{ forloop.counter}}.</i>
+                                {{ j.0 }}
+                                {{ j.1 }}
+                                {% endfor %}
+                                </td>
                             <td>
-                                <a class="layui-btn layui-btn-sm" onclick="deleteRow(this,'{{ i.pjt_name }}')">
+                                <a class="layui-btn layui-btn-sm" onclick="deleteCase(this,'{{ username }}','{{ pjt }}','{{ i.0 }}')">
                                     <i class="layui-icon">&#xe640;</i>
                                 </a>
                             </td>
@@ -43,22 +48,23 @@
 
 <script type="text/javascript">
 
-
     layui.use(['upload','jquery'], function() {
         var $ = layui.jquery;
     });
 
-    function deleteRow(r,pjt_name) {
-        layer.confirm('你要删除项目 ['+pjt_name+'] 吗？', {
+    function deleteCase(r,un,pjt,case_name) {
+        layer.confirm('你要删除测试用例 ['+case_name+'] 吗？', {
             btn: ['删除项目', '放弃'] //可以无限个按钮
             , btn1: function () {
             layer.closeAll();
         }
         }, function () {
+
             var i=r.parentNode.parentNode.rowIndex;
-            document.getElementById('table_del').deleteRow(i);
+
+            document.getElementById('case_del').deleteRow(i);
             layer.closeAll();
-            location.href="/del_pjt/"+pjt_name;
+            location.href="/"+un+"/"+pjt+'/delc/'+case_name+'/';
         });
     }
 </script>
