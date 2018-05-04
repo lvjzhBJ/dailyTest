@@ -53,6 +53,7 @@ class Project(models.Model):
 class ProjectnewAdmin(admin.ModelAdmin):
     list_display = ('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status','stand')
 
+
 admin.site.register(Project, ProjectnewAdmin)
 
 

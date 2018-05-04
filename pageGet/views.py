@@ -18,7 +18,6 @@ def pjt2client(request):
     if request.method == 'GET':
         pjt_on = Project.objects.filter(crom_status=0)[:1]
         if pjt_on:
-            print pjt_on[0]
             pjt_dict = {'id':pjt_on[0].id,
                         'pjt_name':pjt_on[0].pjt_name,
                         'app_file':str(pjt_on[0].app_file),
@@ -70,7 +69,7 @@ def client2img(request):
                        + str(get_json.get('pjt_id'))\
                        +'/'
             keys = request.FILES.keys()
-            print img_path
+            print(img_path)
             for k in keys:
                 app_file = request.FILES[k]
                 if app_file:
@@ -106,15 +105,15 @@ def clean_apk(request):
 
             for i in all_app:
                 if i in exit_app:
-                    print 'pjt apk is:',i
+                    print('pjt apk is:',i)
                 else:
                     if os.path.exists(img_path+i):
-                        print 'del apk:', img_path + i
+                        print('del apk:', img_path + i)
                         # 删除文件，可使用以下两种方法。
                         os.remove(img_path+i)
                         # os.unlink(my_file)
                     else:
-                        print 'no such file:%s' % img_path+i
+                        print('no such file:%s' % img_path+i)
 
             return HttpResponse(acc_pjt, content_type='application/json')
         except:

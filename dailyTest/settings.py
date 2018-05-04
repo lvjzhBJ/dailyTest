@@ -154,15 +154,15 @@ LOGGING = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -189,3 +189,15 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = 'lv_jz@163.com'
 EMAIL_HOST_PASSWORD = '1@#qweAsdz'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+DEFAULT_FILE_STORAGE = 'aliyun_oss2_storage.backends.AliyunMediaStorage'
+
+ACCESS_KEY_ID = "LTAIeEscH1ag5dWj"
+ACCESS_KEY_SECRET = "1R6ukC8o98clQxNsLDCPI3Is0t4003"
+END_POINT = "oss-cn-huhehaote.aliyuncs.com"
+BUCKET_NAME = "apk2ali"
+BUCKET_ACL_TYPE = "public-read"  # private, public-read, public-read-write
+
+STATICFILES_STORAGE = 'aliyun_oss2_storage.backends.AliyunStaticStorage'
+

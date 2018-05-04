@@ -4,15 +4,14 @@ import json
 import re
 import time
 from django import forms
-from models import User
+from .models import User
 from captcha.models import CaptchaStore
-from utils.email_send import send_register_email
-from userAuth.models import EmailVerifyRecord
 from captcha.helpers import captcha_image_url
+from .utils.email_send import send_register_email
+from userAuth.models import EmailVerifyRecord
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import HttpResponse,render_to_response,render,redirect
-
 
 
 # Create your views here.
@@ -20,6 +19,7 @@ def mobile_validate(value):
     mobile_re = re.compile(r'^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$')
     if not mobile_re.match(value):
         raise ValidationError('手机号码格式错误')
+
 
 class VerForm(forms.Form):
     vercode = forms.CharField(required=True,
@@ -164,8 +164,8 @@ def forget(request):
             if vv:
                 d_time = vv[0].expiration.replace(tzinfo=None)
                 ans_time = time.mktime(d_time.timetuple())
-                print 'time_now::', time.time()
-                print 'time_old::', d_time
+                print('time_now::', time.time())
+                print('time_old::', d_time)
                 if int(time.time() - ans_time) > 0:
                     return HttpResponse('验证码已失效')
             else:

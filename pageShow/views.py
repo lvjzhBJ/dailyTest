@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import json
-import sys
+import traceback
 import time
 import pickle
 from django import forms
@@ -10,10 +10,6 @@ from userAuth.models import User
 from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt,ManualCase
 from django.views.decorators.csrf import csrf_exempt
 from userAuth.utils.time2json import CJsonEncoder
-
-reload(sys)
-
-sys.setdefaultencoding('utf8')
 
 
 class ProjectForm(forms.Form):
@@ -99,25 +95,26 @@ user
 
 
 def db_insert_pjt(userid):
-
     user = User.objects.filter(id=userid)
     project_info = list(Project.objects.filter(pjt_owner=user).values('id','pjt_name','app_file','app_plate','pjt_owner','create_time','crom_status','stand'))
     if project_info:
-        pjt,is_new = ResponsePjt.objects.get_or_create(user_id=userid,
-                                                       user_parent=user[0],
-                                                       defaults={'pjt_info':pickle.dumps(project_info)})
+        try:
+            pjt,is_new = ResponsePjt.objects.get_or_create(user_id=userid,
+                                                           user_parent=user[0])
 
-        if not is_new:
-            pjt.pjt_info=pickle.dumps(project_info)
-            pjt.add_time = pjt.mod_time
+            # pjt.pjt_info = project_info
+            print(pickle.dumps(project_info))
+            pjt.pjt_info = pickle.dumps(project_info).decode()
             pjt.save()
+        except:
+            print(traceback.format_exc())
 
 
 def get_pjts(userid):
     pjt_list = ResponsePjt.objects.filter(user_id=userid)
 
     if len(pjt_list) == 1:
-        return pickle.loads(pjt_list.values('pjt_info')[0]['pjt_info'])
+        return pickle.loads(pjt_list.values('pjt_info')[0]['pjt_info'].encode('utf-8'))
     else:
         return None
 
@@ -135,12 +132,13 @@ def user_show(request,un):
 
         email = request.session.get('email')
         userid=request.session.get ('userid')
-
+        db_insert_pjt(userid)
         project_info = get_pjts(userid)
+        print(project_info)
         project_info_json = json.dumps(project_info,cls=CJsonEncoder)
         project_info_json = json.loads(project_info_json)
         request.session['project_info_json'] = project_info_json
-        print project_info_json
+        print(project_info_json)
         rsp = render(request, 'weHtml/user_show.html', {'username': username,
                                                         'email': email,
                                                         'ver_status':ver_status,
@@ -161,7 +159,7 @@ def pjt2stand(request,un):
     if request.method == 'POST':
 
         stand_id = request.POST.get('stand_pjt_edit')
-        print request.POST
+        print(request.POST)
 
         Project.objects.filter(stand=1).update(stand=0)
 
@@ -295,7 +293,6 @@ def del_pjt(request,pjt):
 project
 '''
 
-
 def get_pages(pjt_id):
     page_tree = ResponsePage.objects.filter(pjt_id=pjt_id)
 
@@ -377,7 +374,7 @@ def pjt_edit(request,un,pjt):
         else:
             case_in = pickle.loads(case_in_db.case_info)
             if case not in case_in:
-                print case_in
+                print(case_in)
                 case_in.append([pt.get('case_title'),case])
                 case_in_db.case_info = pickle.dumps(case_in)
                 case_in_db.save()

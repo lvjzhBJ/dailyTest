@@ -6,7 +6,7 @@ import logging
 
 logger=logging.getLogger ('django')
 
-def get_apk():
+def qget_apk():
     url='http://47.93.220.141/'
 
     req=urllib2.Request(url+'p2c/')
@@ -20,15 +20,15 @@ def get_apk():
             per = 100
         if int(per)%2==0:
             pre = int(per)
-            print '%.2f%%' % int(per)
+            print('%.2f%%' % int(per))
 
     local = os.path.join('./',res_dict['app_file'])
 
     urllib.urlretrieve(url + '/pageGet/media/'+res_dict['app_file'],local,Schedule)
 
 
-def get_po():
-    print 123
+def qget_po():
+    print(123)
 
 if __name__ == '__main__':
-    get_apk()
+    qget_apk()

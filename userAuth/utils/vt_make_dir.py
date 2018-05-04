@@ -2,7 +2,7 @@
 import os
 
 def mk_dir(path):
-    print path
+    print(path)
     path=path.strip()
     path=path.rstrip("\\")
     isExists=os.path.exists(path)
