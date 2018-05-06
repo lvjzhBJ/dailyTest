@@ -39,7 +39,7 @@ admin.site.register(PageGet, PageGetAdmin)
 class Project(models.Model):
     id = models.AutoField(primary_key=True)
     pjt_name = models.CharField(max_length=50)
-    app_file = models.FileField(upload_to='appfile')
+    app_file = models.CharField(max_length=100)
     app_plate = models.CharField(max_length=20)
     pjt_owner = models.ForeignKey(User)
     create_time = models.DateTimeField(default=timezone.now)

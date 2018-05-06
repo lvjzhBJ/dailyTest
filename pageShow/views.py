@@ -10,6 +10,7 @@ from userAuth.models import User
 from pageGet.models import Project,PageGet,ResponsePjt,ResponsePage,ResponseRpt,ManualCase
 from django.views.decorators.csrf import csrf_exempt
 from userAuth.utils.time2json import CJsonEncoder
+from dailyTest.settings import ACCESS_KEY_ID,ACCESS_KEY_SECRET,BUCKET_NAME,END_POINT
 
 
 class ProjectForm(forms.Form):
@@ -102,8 +103,6 @@ def db_insert_pjt(userid):
             pjt,is_new = ResponsePjt.objects.get_or_create(user_id=userid,
                                                            user_parent=user[0])
 
-            # pjt.pjt_info = project_info
-            print(pickle.dumps(project_info))
             pjt.pjt_info = pickle.dumps(project_info).decode()
             pjt.save()
         except:
@@ -134,11 +133,9 @@ def user_show(request,un):
         userid=request.session.get ('userid')
         db_insert_pjt(userid)
         project_info = get_pjts(userid)
-        print(project_info)
         project_info_json = json.dumps(project_info,cls=CJsonEncoder)
         project_info_json = json.loads(project_info_json)
         request.session['project_info_json'] = project_info_json
-        print(project_info_json)
         rsp = render(request, 'weHtml/user_show.html', {'username': username,
                                                         'email': email,
                                                         'ver_status':ver_status,
@@ -185,10 +182,19 @@ def pjt2stand(request,un):
 
 
 @csrf_exempt
+def user_apk(request):
+    file = request.FILES
+    print('1')
+    print('1')
+    print('1')
+
+    return HttpResponse()
+
+
+@csrf_exempt
 def user_pross(request,un):
     username = request.session.get('username')
     ver_status = request.session.get('ver_status')
-
 
     if un != username:
         request.session['ver_status'] = 'FAIL_用登录失效...'
@@ -201,6 +207,73 @@ def user_pross(request,un):
         if projectform.is_valid():
             pjt_name = projectform.cleaned_data['pjt_name']
             app_file = request.FILES.get('apk_file', None)
+            print(app_file)
+
+            userid = request.session.get('userid')
+            user = User.objects.filter(username=username, id=userid)
+
+            pjt = Project()
+            pjt.pjt_name = pjt_name
+            pjt.app_file = str(app_file)
+            pjt.pjt_owner = user[0]
+            if str(app_file)[-4:] == '.apk':
+                pjt.app_plate = 'Android'
+            pjt.save()
+            db_insert_pjt(userid)
+
+            def save_upload_file_to_aliyun(PostFile, Outputfile):
+                access_key = ACCESS_KEY_ID
+                secret_key = ACCESS_KEY_SECRET
+                bucket_name = BUCKET_NAME
+                try:
+                    import oss2
+                    auth = oss2.Auth(access_key, secret_key)
+                    bucket = oss2.Bucket(auth, END_POINT, bucket_name)
+                    result = bucket.put_object(Outputfile, PostFile)
+                    return u"SUCCESS"+str(result.status)
+                except Exception as e:
+                    print(str(e))
+                    return str(e)
+            state = save_upload_file_to_aliyun(app_file, pjt_name+str(app_file))
+            print(state)
+
+            request.session['ver_status'] = '项目' + pjt_name + '创建成功'
+            return redirect('/' + username + '/show')
+    else:
+        projectform=ProjectForm()
+        email = request.session.get('email')
+        project_info_json = request.session.get('project_info_json')
+
+        rsp = render(request, 'weHtml/user_pross.html', {'username': username,
+                                                       'email': email,
+                                                      'projectform':projectform,
+                                                       'ver_status': ver_status,
+                                                       'project_info_json': project_info_json
+                                                       })
+
+        request.session['ver_status'] = None
+        return rsp
+
+
+@csrf_exempt
+def user_pross2(request,un):
+    username = request.session.get('username')
+    ver_status = request.session.get('ver_status')
+
+    if un != username:
+        request.session['ver_status'] = 'FAIL_用登录失效...'
+        return redirect('/login')
+
+    if request.method == 'POST':
+
+        projectform=ProjectForm(request.POST,request.FILES)
+
+        if projectform.is_valid():
+            pjt_name = projectform.cleaned_data['pjt_name']
+            app_file = request.FILES.get('apk_file', None)
+
+            # from aliyun_oss2_storage.backends import AliyunBaseStorage
+            # AliyunBaseStorage.
 
             pjt = Project()
             pjt.pjt_name = pjt_name
@@ -288,10 +361,10 @@ def del_pjt(request,pjt):
 
         return redirect('/' + username + '/del')
 
-
 '''
 project
 '''
+
 
 def get_pages(pjt_id):
     page_tree = ResponsePage.objects.filter(pjt_id=pjt_id)
@@ -300,6 +373,7 @@ def get_pages(pjt_id):
         return pickle.loads(page_tree.values('page_info')[0]['page_info'])
     else:
         return None
+
 
 @csrf_exempt
 def pjt_show(request,un,pjt):
@@ -374,7 +448,6 @@ def pjt_edit(request,un,pjt):
         else:
             case_in = pickle.loads(case_in_db.case_info)
             if case not in case_in:
-                print(case_in)
                 case_in.append([pt.get('case_title'),case])
                 case_in_db.case_info = pickle.dumps(case_in)
                 case_in_db.save()
@@ -548,6 +621,7 @@ def del_case(request,un,pjt,cn):
 report
 '''
 
+
 @csrf_exempt
 def rpt_sum(request,un,pjt):
     username = request.session.get('username')
@@ -670,3 +744,4 @@ def rpt_manual(request,un,pjt):
                                                        'test_case_info': test_case_info,
                                                        'project_info_json': project_info_json})
     return rsp
+

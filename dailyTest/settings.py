@@ -177,6 +177,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pageGet/media').replace('\\', '/')
 MEDIA_URL = '/pageGet/media/'
 
+
 if DEBUG == 'on':
     local_ip = '127.0.0.1'
 else:
@@ -199,5 +200,5 @@ END_POINT = "oss-cn-huhehaote.aliyuncs.com"
 BUCKET_NAME = "apk2ali"
 BUCKET_ACL_TYPE = "public-read"  # private, public-read, public-read-write
 
-STATICFILES_STORAGE = 'aliyun_oss2_storage.backends.AliyunStaticStorage'
+# STATICFILES_STORAGE = 'aliyun_oss2_storage.backends.AliyunStaticStorage'
 

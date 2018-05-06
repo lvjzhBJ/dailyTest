@@ -60,9 +60,6 @@
                              <br><br>
                              <ul id = "id_apk_file_on" ><a style="font-size: 15px; color: #009688;">鼠标悬停可查看包文件名</a></ul>
                              <br>
-{#                             <div id='pross' style="height:20px;width:220px;border:2px solid gray;float:left;margin-right:10px;">#}
-{#                                 <div id='pross_per' style="height:100%;width:0px;background:gray;"></div>#}
-{#                             </div>#}
                              <div class="layui-progress">
                                   <div id='pross_per' class="layui-progress-bar" style="height:100%;width:0px;;"></div>
                                 </div>
@@ -74,8 +71,6 @@
                          </div>
                      </div>
                   </form>
-
-
                 </div>
             </div>
         </div>
@@ -127,7 +122,7 @@
                 form.append('apk_file', apk_file);
                 form.append('pjt_name', pjt_name);
                 xhr.upload.addEventListener('progress', on_progress, false);
-                xhr.open('POST', '{{ request.path }}', true);
+                xhr.open('POST', '{{ request.url }} %}/upapk/', true);
                 xhr.setRequestHeader('X-CSRFTOKEN', '{{ request.COOKIES.csrftoken }}');
                 xhr.send(form);
             }

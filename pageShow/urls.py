@@ -33,5 +33,6 @@ urlpatterns = [
     url(r'^(?P<un>.*)/show/$', views.user_show),
     url(r'^(?P<un>.*)/pjt2stand/$', views.pjt2stand),
     url(r'^(?P<un>.*)/pross/$', views.user_pross),
+    url(r'^upapk/$', views.user_apk),
     url(r'^(?P<un>.*)/del/$', views.user_del),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
