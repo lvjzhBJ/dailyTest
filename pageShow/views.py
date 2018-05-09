@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals,print_function
 import json
 import traceback
 import time
@@ -22,7 +22,7 @@ class ProjectForm(forms.Form):
                                        'class':'layui-input',
                                        'lay-verify':'required'}))
 
-    apk_file = forms.FileField(label='安装包')
+    apk_file = forms.CharField(label='安装包')
 
 
 def get_tree(parent_pjt):
@@ -182,13 +182,105 @@ def pjt2stand(request,un):
 
 
 @csrf_exempt
-def user_apk(request):
-    file = request.FILES
-    print('1')
-    print('1')
-    print('1')
+def pjtinfo2db(request):
+    username = request.session.get('username')
 
-    return HttpResponse()
+    if request.method == 'POST':
+        pjt_name = request.POST.get('pjt_name','')
+        app_file = request.POST.get('apk_file','')
+
+        userid = request.session.get('userid')
+        user = User.objects.filter(username=username, id=userid)
+        app_plate = ''
+        if str(app_file)[-4:] == '.apk':
+            app_plate = 'Android'
+        pjt,is_new = Project.objects.get_or_create(pjt_name=pjt_name
+                                            ,app_file=app_file
+                                            ,pjt_owner=user[0]
+                                            ,app_plate=app_plate)
+        if is_new:
+            db_insert_pjt(userid)
+        resp = 'dd_test_apk_'+str(user[0].id) + '_' + str(pjt.id) + '_'
+
+        return HttpResponse(resp)
+
+
+@csrf_exempt
+def get_oss_token(request):
+    import time
+    import datetime
+    import json
+    import base64
+    import hmac
+    from hashlib import sha1 as sha
+
+    accessKeyId = ACCESS_KEY_ID
+    accessKeySecret = ACCESS_KEY_SECRET
+    expire_time = 30
+    upload_dir = 'dd_apk/'
+    host = 'http://'+ BUCKET_NAME + '.' + END_POINT
+
+    def get_iso_8601(expire):
+        gmt = datetime.datetime.fromtimestamp(expire).isoformat()
+        gmt += 'Z'
+        return gmt
+
+    def get_token():
+        now = int(time.time())
+        expire_syncpoint = now + expire_time
+        expire = get_iso_8601(expire_syncpoint)
+
+        policy_dict = {}
+        policy_dict['expiration'] = expire
+        condition_array = []
+
+        array_item = []
+        array_item.append('starts-with')
+        array_item.append('$key')
+        array_item.append(upload_dir)
+        condition_array.append(array_item)
+        policy_dict['conditions'] = condition_array
+        policy = json.dumps(policy_dict).strip()
+        policy_encode = base64.b64encode(policy)
+        h = hmac.new(accessKeySecret, policy_encode, sha)
+        sign_result = base64.encodestring(h.digest()).strip()
+
+        token_dict = {}
+        token_dict['accessid'] = accessKeyId
+        token_dict['host'] = host
+        token_dict['policy'] = policy_encode
+        token_dict['signature'] = sign_result
+        token_dict['expire'] = expire_syncpoint
+        token_dict['dir'] = upload_dir
+        result = json.dumps(token_dict)
+        return result
+
+    return HttpResponse(get_token())
+
+
+@csrf_exempt
+def apk2oss(request,un):
+    username = request.session.get('username')
+    ver_status = request.session.get('ver_status')
+
+    if un != username:
+        request.session['ver_status'] = 'FAIL_用登录失效...'
+        return redirect('/login')
+
+    if request.method == 'GET':
+        projectform=ProjectForm()
+        email = request.session.get('email')
+        project_info_json = request.session.get('project_info_json')
+
+        rsp = render(request, 'weHtml/user_oss.html', {'username': username,
+                                                        'email': email,
+                                                        'projectform':projectform,
+                                                        'ver_status': ver_status,
+                                                        'project_info_json': project_info_json
+                                                       })
+
+        request.session['ver_status'] = None
+        return rsp
 
 
 @csrf_exempt

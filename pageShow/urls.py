@@ -32,7 +32,9 @@ urlpatterns = [
     url(r'^(?P<un>.*)/(?P<pjt>.*)/fcs/$', views.pjt_func),
     url(r'^(?P<un>.*)/show/$', views.user_show),
     url(r'^(?P<un>.*)/pjt2stand/$', views.pjt2stand),
+    url(r'^(?P<un>.*)/apk2oss/$', views.apk2oss),
+    url(r'^get_oss_token/$', views.get_oss_token),
+    url(r'^pjt2db/$', views.pjtinfo2db),
     url(r'^(?P<un>.*)/pross/$', views.user_pross),
-    url(r'^upapk/$', views.user_apk),
     url(r'^(?P<un>.*)/del/$', views.user_del),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

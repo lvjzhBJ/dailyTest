@@ -105,6 +105,7 @@
 			}
 		}
 		function upload() {
+            alert(123);
 
             var xhr = new XMLHttpRequest();
             var apk_file = document.getElementById('id_apk_file').files[0];
@@ -122,7 +123,7 @@
                 form.append('apk_file', apk_file);
                 form.append('pjt_name', pjt_name);
                 xhr.upload.addEventListener('progress', on_progress, false);
-                xhr.open('POST', '{{ request.url }} %}/upapk/', true);
+                xhr.open('POST', '{{ request.url }}/upapk/', true);
                 xhr.setRequestHeader('X-CSRFTOKEN', '{{ request.COOKIES.csrftoken }}');
                 xhr.send(form);
             }

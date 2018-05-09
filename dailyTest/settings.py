@@ -200,5 +200,3 @@ END_POINT = "oss-cn-huhehaote.aliyuncs.com"
 BUCKET_NAME = "apk2ali"
 BUCKET_ACL_TYPE = "public-read"  # private, public-read, public-read-write
 
-# STATICFILES_STORAGE = 'aliyun_oss2_storage.backends.AliyunStaticStorage'
-
