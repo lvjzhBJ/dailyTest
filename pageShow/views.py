@@ -462,7 +462,8 @@ def get_pages(pjt_id):
     page_tree = ResponsePage.objects.filter(pjt_id=pjt_id)
 
     if len(page_tree) == 1:
-        return pickle.loads(page_tree.values('page_info')[0]['page_info'])
+        print(page_tree.values('page_info')[0]['page_info'])
+        return pickle.loads(page_tree.values('page_info')[0]['page_info'].encode('utf-8'))
     else:
         return None
 
@@ -495,7 +496,7 @@ def pjt_show(request,un,pjt):
         page_info = get_pages(pjt_on[0].id)
         page_info_json = json.dumps(page_info, cls=CJsonEncoder)
         request.session['page_info_json'] = page_info_json
-
+        print(123)
         return render_to_response('weHtml/pjt_show.html',
                                   {'project_info_json':project_info_json,
                                    'userid': userid,
@@ -729,7 +730,7 @@ def rpt_sum(request,un,pjt):
     test_case_info['status']=0
     if rpt:
         test_case_info['status']=1
-        test_case_info['test_case_list']=pickle.loads (rpt[0].rpt_info)
+        test_case_info['test_case_list']=pickle.loads(rpt[0].rpt_info)
     if rpt:
         rpt_list = pickle.loads(rpt[0].rpt_info)
 
