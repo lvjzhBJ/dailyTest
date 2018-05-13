@@ -768,11 +768,11 @@ def rpt_flow(request,un,pjt):
 
     test_case_info={}
     test_case_info['status'] = 0
-    rpt = pickle.loads(rpt[0].rpt_info)
+    rpt_pickle=None
     if rpt:
+        rpt_pickle = pickle.loads(rpt[0].rpt_info)
         test_case_info['status'] = 1
-        test_case_info['test_case_list'] = rpt
-
+        test_case_info['test_case_list'] = rpt_pickle
 
     rsp = render(request, 'weHtml/rpt_flow.html', {'username': username,
                                               'email': email,
@@ -780,7 +780,7 @@ def rpt_flow(request,un,pjt):
                                               'rpt':'报告',
                                               'pjt_id':pjt_on[0].id,
                                               'userid':userid,
-                                                'rpt_json':json.dumps(rpt),
+                                                'rpt_json':json.dumps(rpt_pickle),
                                               'test_case_info': test_case_info,
                                                 'project_info_json': project_info_json})
     return rsp
